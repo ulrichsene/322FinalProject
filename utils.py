@@ -1,5 +1,5 @@
 import numpy as np
-from mysklearn2.mypytable2 import MyPyTable
+from mysklearn.mypytable import MyPyTable
 
 def get_column(table, header, col_name):
     """Extracts a column from the table data as a list.

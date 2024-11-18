@@ -1,4 +1,4 @@
-from mysklearn2.mypytable2 import MyPyTable
+from mysklearn.mypytable import MyPyTable
 import utils
 import numpy as np
 import matplotlib.pyplot as plt
