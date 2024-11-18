@@ -185,6 +185,37 @@ class MyPyTable:
         #close the file
         output_file.close()
 
+    def save_to_file_condition(self, filename, col_name, condition=None):
+        """Save column names and data to a CSV file. If condition is provided,
+        follow instruction.
+
+        Args:
+            filename(str): relative path for the CSV file to save the contents to.
+            col_name(str): header that condition belongs to
+            condition(int): value that must be met for outfile
+
+        Notes:
+            Use the csv module.
+        """
+
+        # open file in write mode
+        with open(filename, "w", encoding="utf-8", newline="") as output_file:
+            csv_writer = csv.writer(output_file)
+
+            # write headers to the CSV file
+            csv_writer.writerow(self.column_names)
+
+            # find the index of col_name
+            if col_name not in self.column_names:
+                raise ValueError(f"Column '{col_name}' not found in column names.")
+
+            col_index = self.column_names.index(col_name)
+
+            # write rows that meet condition
+            for row in self.data:
+                if condition is None or row[col_index] == condition:
+                    csv_writer.writerow(row)
+
     def get_instances(self):
         """Computes the dimension of the table (N).
 
