@@ -669,7 +669,7 @@ def print_confusion_categorical_matrix_with_metrics(confusion_matrix, labels):
     # print the confusion matrix with the additional metrics
     print(tabulate(matrix_with_metrics, headers=headers, floatfmt=".1f"))
 
-def evaluate_classifier(X, y, classifier, pos_label = "yes", n_splits = 10):
+def evaluate_classifier(X, y, classifier, pos_label = "1", n_splits = 10):
     """ This function will return the evaluation scores for various metrics for 
         each classifier.
 
@@ -703,3 +703,54 @@ def evaluate_classifier(X, y, classifier, pos_label = "yes", n_splits = 10):
     print(f"F1 Measure = {f1:.2f}")
     print("\nConfusion Matrix:")
     print_confusion_categorical_matrix_with_metrics(confusion, labels)
+
+def combine_normalized_attributes2(*columns):
+    """ Combines normalized and categorical attributes into a 2D list.
+    
+    Args:
+        *columns: Any number of lists representing normalized and categorical attributes.
+    
+    Returns:
+        list: A 2D list of combined instances.
+    """
+    # Ensure all columns have the same length
+    num_rows = len(columns[0])  # Assume all columns have the same length
+    for col in columns:
+        if len(col) != num_rows:
+            raise ValueError("All columns must have the same length.")
+    
+    combined_instances = []
+    for i in range(num_rows):
+        row = []
+        for column in columns:
+            row.append(column[i])
+        combined_instances.append(row)
+    
+    return combined_instances
+
+def prepare_mixed_data():
+   data = MyPyTable()
+   data.load_from_file("output_data/cleaned_diabetes_data.csv")
+   
+   # get numeric X columns and normalize
+   age_values = data.get_column("age")
+   a1c_values = data.get_column("HbA1c_level")
+   glucose_values = data.get_column("blood_glucose_level")
+   
+   normalized_age = normalize_train_attribute(age_values)
+   normalized_a1c = normalize_train_attribute(a1c_values)
+   normalized_glucose_level = normalize_train_attribute(glucose_values)
+   
+   # get rest of X columns
+   gender_values = data.get_column("gender")
+   hyptertension_values = data.get_column("hypertension")
+   heart_disease_values = data.get_column("heart_disease")
+   smoking_values = data.get_column("smoking_history")
+   
+   # combine these values into X
+   X = combine_normalized_attributes2(normalized_age, normalized_a1c, normalized_glucose_level, gender_values, hyptertension_values, heart_disease_values, smoking_values)
+   
+   # get target value
+   diabetes = data.get_column("diabetes")
+   
+   return X, diabetes
