@@ -1,4 +1,7 @@
 import numpy as np
+import random
+import csv
+from collections import defaultdict
 from tabulate import tabulate
 from mysklearn.mypytable import MyPyTable
 from mysklearn import myevaluation

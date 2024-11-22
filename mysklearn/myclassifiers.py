@@ -150,8 +150,132 @@ class MySimpleLinearRegressionClassifier:
             predictions.append(discretized_value)
         return predictions
 
+# class MyKNeighborsClassifier:
+#     """Represents a simple k nearest neighbors classifier.
+
+#     Attributes:
+#         n_neighbors(int): number of k neighbors
+#         X_train(list of list of numeric vals): The list of training instances (samples).
+#                 The shape of X_train is (n_train_samples, n_features)
+#         y_train(list of obj): The target y values (parallel to X_train).
+#             The shape of y_train is n_samples
+#         categorical(list of bool): List of booleans indicating if each feature is categorical (True) or numerical (False)
+
+#     Notes:
+#         Loosely based on sklearn's KNeighborsClassifier:
+#             https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html
+#         Terminology: instance = sample = row and attribute = feature = column
+#         Assumes data has been properly normalized before use.
+#     """
+#     def __init__(self, n_neighbors=3, categorical = None):
+#         """Initializer for MyKNeighborsClassifier.
+
+#         Args:
+#             n_neighbors(int): number of k neighbors
+#             categorical(list of bool): List of booleans indicating if each feature is categorical (True) or numerical (False)
+#         """
+#         self.n_neighbors = n_neighbors
+#         self.X_train = None
+#         self.y_train = None
+#         if categorical is not None:
+#             self.categorical = categorical
+#         else:
+#             self.categorical = []
+
+#     def fit(self, x_train, y_train):
+#         """Fits a kNN classifier to X_train and y_train.
+
+#         Args:
+#             X_train(list of list of numeric vals): The list of training instances (samples).
+#                 The shape of X_train is (n_train_samples, n_features)
+#             y_train(list of obj): The target y values (parallel to X_train)
+#                 The shape of y_train is n_train_samples
+
+#         Notes:
+#             Since kNN is a lazy learning algorithm, this method just stores X_train and y_train
+#         """
+#         self.X_train = x_train
+#         self.y_train = y_train
+
+#     def kneighbors(self, x_test, n_neighbors=None):
+#         """Determines the k closes neighbors of each test instance.
+
+#         Args:
+#             X_test(list of list of numeric vals): The list of testing samples
+#                 The shape of X_test is (n_test_samples, n_features)
+
+#         Returns:
+#             distances(list of list of float): 2D list of k nearest neighbor distances
+#                 for each instance in X_test
+#             neighbor_indices(list of list of int): 2D list of k nearest neighbor
+#                 indices in X_train (parallel to distances)
+#         """
+
+#         if n_neighbors is None:
+#             n_neighbors = self.n_neighbors # use default (3) if not specified
+
+#         # need to store distances and index for for each test instance (return two separate lists)
+#         indexes = []
+#         distances = []
+
+#         for test_instance in x_test:
+#             row_index_distance = [] # list to store distances for current test instance
+
+#             for i, train_instance in enumerate(self.X_train): # calculate distance between test instance and all training instances
+#                 distance = utils.compute_mixed_euclidean_distance(train_instance, test_instance, self.categorical)
+#                 row_index_distance.append((i, distance))
+#             # sort distances and get the k closest neighbors
+#             row_index_distance.sort(key = operator.itemgetter(-1))
+#             top_k = row_index_distance[:n_neighbors] # use n_neighbors from parameter
+
+#             current_distances = []
+#             current_indexes = []
+
+#             for value in top_k:
+#                 current_indexes.append(value[0])
+#                 current_distances.append(value[1])
+#             indexes.append(current_indexes)
+#             distances.append(current_distances)
+#         return indexes, distances
+
+#     def predict(self, x_test):
+#         """Makes predictions for test instances in X_test.
+
+#         Args:
+#             X_test(list of list of numeric vals): The list of testing samples
+#                 The shape of X_test is (n_test_samples, n_features)
+
+#         Returns:
+#             y_predicted(list of obj): The predicted target y values (parallel to X_test)
+#         """
+#         # need to call the kneighbors method to get the index of the k nearest neighbors
+#         neighbor_indexes, distances = self.kneighbors(x_test)
+#         y_predicted = []
+
+#         # next need to find the corresponding y_train values for the nearest neighbors (classification)
+#         # perform majority voting to determine most common class label among neighbors
+#         # return the predicted class label
+
+#         for i, neighbors in enumerate(neighbor_indexes):
+#             label_counts = {}
+#             for neighbor_index in neighbors:
+#                 # look up the class label in y_train for the current neighbor
+#                 label = self.y_train[neighbor_index]
+
+#                 # count occurence of each label
+#                 if label in label_counts:
+#                     label_counts[label] += 1
+#                 else:
+#                     label_counts[label] = 1
+
+#             # do majority vote
+#             most_common_label = max(label_counts, key = label_counts.get)
+#             y_predicted.append(most_common_label)
+#         return y_predicted
+    
 class MyKNeighborsClassifier:
     """Represents a simple k nearest neighbors classifier.
+    Altered for categorical attributes!!
 
     Attributes:
         n_neighbors(int): number of k neighbors
@@ -159,7 +283,6 @@ class MyKNeighborsClassifier:
                 The shape of X_train is (n_train_samples, n_features)
         y_train(list of obj): The target y values (parallel to X_train).
             The shape of y_train is n_samples
-        categorical(list of bool): List of booleans indicating if each feature is categorical (True) or numerical (False)
 
     Notes:
         Loosely based on sklearn's KNeighborsClassifier:
@@ -167,22 +290,17 @@ class MyKNeighborsClassifier:
         Terminology: instance = sample = row and attribute = feature = column
         Assumes data has been properly normalized before use.
     """
-    def __init__(self, n_neighbors=3, categorical = None):
+    def __init__(self, n_neighbors):
         """Initializer for MyKNeighborsClassifier.
 
         Args:
             n_neighbors(int): number of k neighbors
-            categorical(list of bool): List of booleans indicating if each feature is categorical (True) or numerical (False)
         """
         self.n_neighbors = n_neighbors
         self.X_train = None
         self.y_train = None
-        if categorical is not None:
-            self.categorical = categorical
-        else:
-            self.categorical = []
 
-    def fit(self, x_train, y_train):
+    def fit(self, X_train, y_train):
         """Fits a kNN classifier to X_train and y_train.
 
         Args:
@@ -194,10 +312,10 @@ class MyKNeighborsClassifier:
         Notes:
             Since kNN is a lazy learning algorithm, this method just stores X_train and y_train
         """
-        self.X_train = x_train
+        self.X_train = X_train
         self.y_train = y_train
 
-    def kneighbors(self, x_test, n_neighbors=None):
+    def kneighbors(self, X_test):
         """Determines the k closes neighbors of each test instance.
 
         Args:
@@ -210,35 +328,26 @@ class MyKNeighborsClassifier:
             neighbor_indices(list of list of int): 2D list of k nearest neighbor
                 indices in X_train (parallel to distances)
         """
-
-        if n_neighbors is None:
-            n_neighbors = self.n_neighbors # use default (3) if not specified
-
-        # need to store distances and index for for each test instance (return two separate lists)
-        indexes = []
+        neighbor_indices = []
         distances = []
 
-        for test_instance in x_test:
-            row_index_distance = [] # list to store distances for current test instance
+        for test_row in X_test:
+            row_distances = []
 
-            for i, train_instance in enumerate(self.X_train): # calculate distance between test instance and all training instances
-                distance = utils.compute_mixed_euclidean_distance(train_instance, test_instance, self.categorical)
-                row_index_distance.append((i, distance))
-            # sort distances and get the k closest neighbors
-            row_index_distance.sort(key = operator.itemgetter(-1))
-            top_k = row_index_distance[:n_neighbors] # use n_neighbors from parameter
+            for i, train_row in enumerate(self.X_train):
+                dist = utils.compute_euclidean_distance(test_row, train_row)
+                row_distances.append((i, dist))
 
-            current_distances = []
-            current_indexes = []
+            row_distances.sort(key=lambda x: x[1])
 
-            for value in top_k:
-                current_indexes.append(value[0])
-                current_distances.append(value[1])
-            indexes.append(current_indexes)
-            distances.append(current_distances)
-        return indexes, distances
+            top_k = row_distances[:self.n_neighbors]
 
-    def predict(self, x_test):
+            distances.append([row[1] for row in top_k])
+            neighbor_indices.append([row[0] for row in top_k])
+
+        return distances, neighbor_indices
+
+    def predict(self, X_test):
         """Makes predictions for test instances in X_test.
 
         Args:
@@ -248,29 +357,16 @@ class MyKNeighborsClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-        # need to call the kneighbors method to get the index of the k nearest neighbors
-        neighbor_indexes, distances = self.kneighbors(x_test)
         y_predicted = []
 
-        # next need to find the corresponding y_train values for the nearest neighbors (classification)
-        # perform majority voting to determine most common class label among neighbors
-        # return the predicted class label
+        distances, neighbor_indices = self.kneighbors(X_test)
 
-        for i, neighbors in enumerate(neighbor_indexes):
-            label_counts = {}
-            for neighbor_index in neighbors:
-                # look up the class label in y_train for the current neighbor
-                label = self.y_train[neighbor_index]
+        for indices in neighbor_indices:
+            neighbor_labels = [self.y_train[i] for i in indices]
 
-                # count occurence of each label
-                if label in label_counts:
-                    label_counts[label] += 1
-                else:
-                    label_counts[label] = 1
-
-            # do majority vote
-            most_common_label = max(label_counts, key = label_counts.get)
+            most_common_label = max(set(neighbor_labels), key=neighbor_labels.count)
             y_predicted.append(most_common_label)
+
         return y_predicted
 
 class MyDummyClassifier:

@@ -1,5 +1,6 @@
 import copy
 import csv
+import random
 from tabulate import tabulate
 
 # combined methods from both Hannah and Eva's MyPyTables for simplicity
@@ -477,3 +478,45 @@ class MyPyTable:
                 joined_data.append(joined_row)
 
         return MyPyTable(joined_column_names, joined_data)
+
+    def random_subsample_classes(self, filename, col_name, sample_size=1000, random_state=None):
+        """ Randomly subsamples a specified number of instances for each class in a dataset
+        and writes the resulting subset to a new file.
+
+        Args:
+            data (list): Dataset from mypytable.
+            output_file (str): Path to the output CSV file.
+            class_column (str): Column name representing the class label.
+            sample_size (int): Number of instances to sample per class.
+            random_state (int): Seed for reproducibility.
+        """
+        if random_state is not None:
+            random.seed(random_state)
+
+        # Find the index of the class label column
+        col_index = self.column_names.index(col_name)
+
+        # Group rows by class (manually)
+        class_rows = []
+        unique_classes = set(row[col_index] for row in self.data)
+
+        for class_label in unique_classes:
+            class_group = [row for row in self.data if row[col_index] == class_label]
+            if len(class_group) < sample_size:
+                raise ValueError(f"Class '{class_label}' has fewer than {sample_size} rows.")
+            class_rows.append((class_label, class_group))
+
+        # Subsample rows for each class
+        sampled_rows = []
+        for class_label, rows in class_rows:
+            sampled_rows.extend(random.sample(rows, sample_size))
+
+        # Write to output file
+        with open(filename, "w", encoding="utf-8", newline="") as output_file:
+            csv_data = csv.writer(output_file)
+
+            # Write headers first
+            csv_data.writerow(self.column_names)
+
+            # Write sampled rows
+            csv_data.writerows(sampled_rows)
