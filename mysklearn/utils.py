@@ -672,7 +672,7 @@ def print_confusion_categorical_matrix_with_metrics(confusion_matrix, labels):
     # print the confusion matrix with the additional metrics
     print(tabulate(matrix_with_metrics, headers=headers, floatfmt=".1f"))
 
-def evaluate_classifier(X, y, classifier, pos_label = "1", n_splits = 10):
+def evaluate_classifier(X, y, classifier, pos_label = 1.0, n_splits = 10):
     """ This function will return the evaluation scores for various metrics for 
         each classifier.
 
@@ -696,7 +696,7 @@ def evaluate_classifier(X, y, classifier, pos_label = "1", n_splits = 10):
     f1 = myevaluation.binary_f1_score(y, predictions, pos_label=pos_label)
     
     # create the general confusion matrix
-    labels = ["no", pos_label]
+    labels = [0.0, pos_label]
     confusion = myevaluation.confusion_matrix(y, predictions, labels)
     
     # display results
@@ -733,7 +733,7 @@ def combine_normalized_attributes2(*columns):
 
 def prepare_mixed_data():
    data = MyPyTable()
-   data.load_from_file("output_data/cleaned_diabetes_data.csv")
+   data.load_from_file("output_data/diabetes_minimize.csv")
    
    # get numeric X columns and normalize
    age_values = data.get_column("age")
