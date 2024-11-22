@@ -1,5 +1,5 @@
 from mysklearn.mypytable import MyPyTable
-import utils
+import mysklearn.utils as utils
 import numpy as np
 import matplotlib.pyplot as plt
 

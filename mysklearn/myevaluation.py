@@ -168,7 +168,40 @@ def stratified_kfold_split(X, y, n_splits=5, random_state=None, shuffle=False):
         Loosely based on sklearn's StratifiedKFold split():
             https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedKFold.html#sklearn.model_selection.StratifiedKFold
     """
-    return [] # TODO: (BONUS) fix this
+    X_copy = []
+    for i in range(len(X)):
+        X_copy.append(i)
+
+    # Set random seed
+    rand = np.random.default_rng(seed=random_state)
+
+    label_indices = {}
+    for index, label in enumerate(y):
+        if label not in label_indices:
+            label_indices[label] = []
+        label_indices[label].append(index)
+
+    if shuffle:
+        for label in label_indices:
+            rand.shuffle(label_indices[label])
+
+    folds = [[] for _ in range(n_splits)]
+
+    for label, indices in label_indices.items():
+        fold_positions = list(range(n_splits)) * (len(indices) // n_splits) + list(range(len(indices) % n_splits))
+        if shuffle:
+            rand.shuffle(fold_positions)
+
+        for i, index in enumerate(indices):
+            folds[fold_positions[i]].append(index)
+
+    stratified_folds = []
+    for i in range(n_splits):
+        test_indices = folds[i]
+        train_indices = [idx for j, fold in enumerate(folds) if j != i for idx in fold]
+        stratified_folds.append((train_indices, test_indices))
+
+    return stratified_folds
 
 def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
     """Split dataset into bootstrapped training set and out of bag test set.
@@ -283,6 +316,45 @@ def confusion_matrix(y_true, y_pred, labels):
 
     return matrix
 
+# def accuracy_score(y_true, y_pred, normalize=True):
+#     """Compute the classification prediction accuracy score.
+
+#     Args:
+#         y_true(list of obj): The ground_truth target y values
+#             The shape of y is n_samples
+#         y_pred(list of obj): The predicted target y values (parallel to y_true)
+#             The shape of y is n_samples
+#         normalize(bool): If False, return the number of correctly classified samples.
+#             Otherwise, return the fraction of correctly classified samples.
+
+#     Returns:
+#             score(float): If normalize == True, return the fraction of correctly classified samples (float),
+#             else returns the number of correctly classified samples (int).
+
+#     Notes:
+#         Loosely based on sklearn's accuracy_score():
+#             https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score
+#     """
+
+#     # good practice to ensure that the lengths of y_true and y_pred match
+#     if len(y_true) != len(y_pred):
+#         raise ValueError("The lengths of y_true and y_pred must be the same!")
+
+#     # need to keep track of how many correct predictions when loop through
+#     correct_predictions = 0
+
+#     # loop through true values and corresponding predictions
+#     for i in range(len(y_true)):
+#         if y_true[i] == y_pred[i]: # check to see if there's a match
+#             correct_predictions += 1
+
+#     # need to provide implementation if normalize is True
+#     if normalize is True:
+#         return correct_predictions / len(y_true)
+#     else:
+#         return correct_predictions
+
+# eva method
 def accuracy_score(y_true, y_pred, normalize=True):
     """Compute the classification prediction accuracy score.
 
@@ -295,32 +367,21 @@ def accuracy_score(y_true, y_pred, normalize=True):
             Otherwise, return the fraction of correctly classified samples.
 
     Returns:
-            score(float): If normalize == True, return the fraction of correctly classified samples (float),
+        score(float): If normalize == True, return the fraction of correctly classified samples (float),
             else returns the number of correctly classified samples (int).
 
     Notes:
         Loosely based on sklearn's accuracy_score():
             https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score
     """
+    correct_count = sum(1 for true, pred in zip(y_true, y_pred) if true == pred)
 
-    # good practice to ensure that the lengths of y_true and y_pred match
-    if len(y_true) != len(y_pred):
-        raise ValueError("The lengths of y_true and y_pred must be the same!")
-
-    # need to keep track of how many correct predictions when loop through
-    correct_predictions = 0
-
-    # loop through true values and corresponding predictions
-    for i in range(len(y_true)):
-        if y_true[i] == y_pred[i]: # check to see if there's a match
-            correct_predictions += 1
-
-    # need to provide implementation if normalize is True
-    if normalize is True:
-        return correct_predictions / len(y_true)
+    if normalize:
+        score = correct_count / len(y_true) if y_true else 0.0
     else:
-        return correct_predictions
+        score = correct_count
 
+    return score
 
 def binary_precision_score(y_true, y_pred, labels=None, pos_label=None):
     """Compute the precision (for binary classification). The precision is the ratio tp / (tp + fp)
