@@ -509,7 +509,7 @@ def cross_val_predict(X, y, classifier, n_splits=10, random_state=None, shuffle=
     predictions = [None] * len(y)
 
     # call kfold_split to get number of splits
-    folds = myevaluation.kfold_split(X, n_splits=n_splits, random_state=random_state, shuffle=shuffle)
+    folds = myevaluation.stratified_kfold_split(X, y, n_splits=n_splits, random_state=random_state, shuffle=shuffle)
 
     for train_indexes, test_indexes in folds:
         # intialize lists to hold training and testing data for the current fold
@@ -686,7 +686,7 @@ def evaluate_classifier(X, y, classifier, pos_label = 1.0, n_splits = 10):
         Returns: the print output
 
     """
-    predictions = cross_val_predict(X, y, classifier, n_splits=n_splits)
+    predictions = cross_val_predict(X, y, classifier, n_splits=n_splits, random_state=1, shuffle=True)
     
     # calculate metrics
     accuracy = myevaluation.accuracy_score(y, predictions)
@@ -748,10 +748,10 @@ def prepare_mixed_data():
    gender_values = data.get_column("gender")
    hyptertension_values = data.get_column("hypertension")
    heart_disease_values = data.get_column("heart_disease")
-   smoking_values = data.get_column("smoking_history")
+#    smoking_values = data.get_column("smoking_history")
    
    # combine these values into X
-   X = combine_normalized_attributes2(normalized_age, normalized_a1c, normalized_glucose_level, gender_values, hyptertension_values, heart_disease_values, smoking_values)
+   X = combine_normalized_attributes2(normalized_age, normalized_a1c, normalized_glucose_level, gender_values, hyptertension_values, heart_disease_values)
    
    # get target value
    diabetes = data.get_column("diabetes")
