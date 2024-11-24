@@ -3,7 +3,6 @@ import numpy as np
 from mysklearn.myclassifiers import MyRandomForestClassifier
 from mysklearn import utils
 
-
 def test_random_forest_classifier_fit():
     # 14 instance interview dataset (test case 1)
     # header_interview = ["level", "lang", "tweets", "phd", "interviewed_well"]

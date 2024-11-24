@@ -977,7 +977,6 @@ class MyRandomForestClassifier:
         
         self.trees = [] # list to hold the individual trees in the forest
 
-
     def fit(self, X_train, y_train):
         pass
 
