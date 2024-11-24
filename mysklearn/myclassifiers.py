@@ -960,7 +960,6 @@ class MyDecisionTreeClassifier:
                     # recurse to print rules for the subtree
                     self.print_decision_rules(node = subtree, conditions = updated_conditions, attribute_names = attribute_names, class_name = class_name)
 
-
 class MyRandomForestClassifier:
     def __init__(self, M, N, F):
         """
