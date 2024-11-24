@@ -55,13 +55,20 @@ def test_random_forest_classifier_predict():
     vote_count1 = {"True": 0, "False": 0}
     for prediction in tree_predictions1:
         vote_count1[prediction] +=1
-    
+
+    vote_count2 = {"True": 0, "False": 0}
+    for prediction in tree_predictions2:
+        vote_count2[prediction] +=1
+
     majority_vote1 = max(vote_count1, key = vote_count1.get)
+    majority_vote2 = max(vote_count2, key = vote_count2.get)
 
     # same thing here for test case 2
 
     # determine expected predictions based on majority voting
     expected_prediction1 = majority_vote1
+    expected_prediction2 = majority_vote2
 
     # call predict and assert that it equals the majority voting results
     assert model.predict(test_case1) == expected_prediction1
+    assert model.predict(test_case2) == expected_prediction2
