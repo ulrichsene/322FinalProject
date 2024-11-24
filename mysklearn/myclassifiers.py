@@ -960,3 +960,28 @@ class MyDecisionTreeClassifier:
                     # recurse to print rules for the subtree
                     self.print_decision_rules(node = subtree, conditions = updated_conditions, attribute_names = attribute_names, class_name = class_name)
 
+
+class MyRandomForestClassifier:
+    def __init__(self, M, N, F):
+        """
+            Initializes a RandomForest classifier
+
+            Args:
+            - M (int): the number of trees in the forest (best selected)
+            - N (int): the number of trees to generate
+            - F (?): the subset of attributes to use?
+        """
+
+        self.M = M
+        self.N = N
+        self.F = F
+        
+        self.trees = [] # list to hold the individual trees in the forest
+
+
+    def fit(self, X_train, y_train):
+        pass
+
+    def predict(self, X_test):
+        pass
+
