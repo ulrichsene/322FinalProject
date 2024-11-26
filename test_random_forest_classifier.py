@@ -26,7 +26,8 @@ y_train_interview = ["False", "False", "True", "True", "True", "False", "True", 
 def test_random_forest_classifier_fit():
     model = MyRandomForestClassifier(N=5, M=3, F=2)
     model.fit(X_train_interview, y_train_interview)
-
+    # check that the ensemble is correct m = m, f = f, check that each pair of the two trees in the ensemble are different
+# hard code m = 3
     # assert that the correct number of trees (M) were selected
 
     # assert that the bootstrapping was successful (each tree trained on a different sample set)
@@ -72,3 +73,5 @@ def test_random_forest_classifier_predict():
     # call predict and assert that it equals the majority voting results
     assert model.predict(test_case1) == expected_prediction1
     assert model.predict(test_case2) == expected_prediction2
+
+    # n = 10, compute bagging samples, produces 10 lists, each list has [bootstrap sample (trees training set), out of bag sample (used for testing) ]
