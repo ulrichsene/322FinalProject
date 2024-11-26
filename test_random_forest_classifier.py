@@ -26,6 +26,12 @@ y_train_interview = ["False", "False", "True", "True", "True", "False", "True", 
 def test_random_forest_classifier_fit():
     model = MyRandomForestClassifier(N=5, M=3, F=2)
     model.fit(X_train_interview, y_train_interview)
+    desk_m = 3
+
+    assert model.M == desk_m
+    assert model.F != model.F
+    assert model.F != model.F
+    assert model.F != model.F
     # check that the ensemble is correct m = m, f = f, check that each pair of the two trees in the ensemble are different
 # hard code m = 3
     # assert that the correct number of trees (M) were selected
@@ -39,39 +45,13 @@ def test_random_forest_classifier_predict():
     model.fit(X_train_interview, y_train_interview)
 
     # test cases:
-    test_case1 = [["Junior", "Java", "yes", "no"]]
-    test_case2 = [["Junior", "Java", "yes", "yes"]]
+    test_case1 = ["Junior", "Java", "yes", "no"]
+    test_case2 = ["Junior", "Java", "yes", "yes"]
 
-    tree_predictions1 = []
-    tree_predictions2 = []
+    desk_prediction = ["True", "False"]
 
-    for tree in model.trees:
-        prediction1 = tree.predict(test_case1)
-        tree_predictions1.append(prediction1[0])
+    predictions = model.predict([test_case1, test_case2])
 
-        prediction2 = tree.predict(test_case2)
-        tree_predictions2.append(prediction2[0])
-    
-    # need majority voting logic for first test case
-    vote_count1 = {"True": 0, "False": 0}
-    for prediction in tree_predictions1:
-        vote_count1[prediction] +=1
-
-    vote_count2 = {"True": 0, "False": 0}
-    for prediction in tree_predictions2:
-        vote_count2[prediction] +=1
-
-    majority_vote1 = max(vote_count1, key = vote_count1.get)
-    majority_vote2 = max(vote_count2, key = vote_count2.get)
-
-    # same thing here for test case 2
-
-    # determine expected predictions based on majority voting
-    expected_prediction1 = majority_vote1
-    expected_prediction2 = majority_vote2
-
-    # call predict and assert that it equals the majority voting results
-    assert model.predict(test_case1) == expected_prediction1
-    assert model.predict(test_case2) == expected_prediction2
+    assert predictions == desk_prediction
 
     # n = 10, compute bagging samples, produces 10 lists, each list has [bootstrap sample (trees training set), out of bag sample (used for testing) ]
