@@ -199,7 +199,7 @@ def plot_diabetes_status():
     # get the diabetes column
     # create instance of MyPyTable class and load the data
     table = MyPyTable()
-    table.load_from_file("input_data/diabetes_prediction_dataset.csv")
+    table.load_from_file("output_data/diabetes_minimize.csv")
 
     diabetes_column = table.get_column("diabetes")
 
@@ -218,7 +218,7 @@ def plot_gender_distribution():
     """Plot a pie chart for the gender distribution (Male vs Female)."""
      # create instance of MyPyTable class and load the data
     table = MyPyTable()
-    table.load_from_file("input_data/diabetes_prediction_dataset.csv")
+    table.load_from_file("output_data/diabetes_minimize.csv")
 
     gender_column = table.get_column("gender")
 
@@ -238,7 +238,7 @@ def plot_diabetes_by_gender():
 
      # create instance of MyPyTable class and load the data
     table = MyPyTable()
-    table.load_from_file("input_data/diabetes_prediction_dataset.csv")
+    table.load_from_file("output_data/diabetes_minimize.csv")
     
     # extract 'diabetes' and 'gender' columns
     diabetes_column = table.get_column("diabetes")
