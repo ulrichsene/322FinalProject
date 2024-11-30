@@ -981,5 +981,30 @@ class MyRandomForestClassifier:
         pass
 
     def predict(self, X_test):
-        pass
+        """
+        Purpose is to make predictions using the random forest classifier
+        Args: X_test (test instances)
+        Returns: final predictions (majority vote predictions for each test instance)
+        """
+
+        # collect predictions from each tree (calling the decision tree predict method here)
+        all_tree_predictions = []
+
+        for tree in self.trees: # self.trees should already contain the best M trees after calling predict
+            predictions = tree.predict([X_test])
+            all_tree_predictions.append(predictions[0])
+            
+        # perform majority voting here
+        class_counts = {}
+        for label in all_tree_predictions:
+            if label not in class_counts:
+                class_counts[label] = 0
+            class_counts[label] += 1
+        
+        # determine the majority class
+        max_count = max(class_counts.values())
+        majority_class = max(class_counts, key=class_counts.get)
+
+        return majority_class
+
 

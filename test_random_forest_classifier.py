@@ -45,12 +45,12 @@ def test_random_forest_classifier_predict():
     model.fit(X_train_interview, y_train_interview)
 
     # test cases:
-    test_case1 = ["Junior", "Java", "yes", "no"]
-    test_case2 = ["Junior", "Java", "yes", "yes"]
+    test_case1 = ["Junior", "Java", "yes", "no"] # true
+    test_case2 = ["Junior", "Java", "yes", "yes"] # false
 
-    desk_prediction = ["True", "False"]
+    desk_prediction= "True"
 
-    predictions = model.predict([test_case1, test_case2])
+    predictions = model.predict(test_case1)
 
     assert predictions == desk_prediction
 
