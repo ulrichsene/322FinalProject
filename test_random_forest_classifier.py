@@ -29,7 +29,7 @@ def test_random_forest_classifier_fit():
     model.fit(X_train_interview, y_train_interview)
     
     # check the correct number of trees (N) were created in the ensemble
-    assert len(model.trees) == model.N 
+    assert len(model.trees) == model.M
     
     # check that M and F are set correctly
     assert model.M == 3
@@ -60,7 +60,9 @@ def test_random_forest_classifier_predict():
     test_case2 = ["Junior", "Java", "yes", "yes"] # false
 
     prediction1 = model.predict(test_case1)
+    print(prediction1)
     prediction2 = model.predict(test_case2)
+    print(prediction2)
 
     assert prediction1 == "True"
     assert prediction2 == "False"

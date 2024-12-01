@@ -6,9 +6,10 @@
 # I did not attempt the bonus
 # Description: This program contains the various classifer
 # implementations
-##############################################
+#########################
 
 import operator
+from operator import itemgetter
 import numpy as np
 from mysklearn import utils, myevaluation
 import math
@@ -985,11 +986,12 @@ class MyRandomForestClassifier:
         y_train (list): training labels.
         """
 
-        np.random.seed(42)
         n_samples = len(X_train)
         n_features = len(X_train[0])
         # keep track of previously used feature subsets to prevent duplicates
         used_feature_sets = []
+
+        tree_performance = []
         
         for _ in range(self.N):
             bootstrap_indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
@@ -1013,7 +1015,27 @@ class MyRandomForestClassifier:
             tree = MyDecisionTreeClassifier()
             tree.fit(bootstrap_features, bootstrap_y)
 
-            self.trees.append((tree, feature_indices, bootstrap_indices))
+            predictions = []
+
+            if X_train is not None and y_train is not None:
+                for row in X_train:
+                    selected_features = []
+                    for i in feature_indices:
+                        selected_features.append(row[i])
+                    predictions.append(tree.predict([selected_features]))
+                 
+                accuracy = myevaluation.accuracy_score(y_train, predictions)
+            else:
+                accuracy = 0.0
+
+            tree_performance.append((accuracy, tree, feature_indices, bootstrap_indices))
+
+            # should sort the trees by accuracy in descending order 
+            tree_performance.sort(reverse=True, key=itemgetter(0))
+            self.trees = []
+
+            for __, tree, feature_indices, bootstrap_indices in tree_performance[:self.M]:
+                self.trees.append((tree,feature_indices, bootstrap_indices))
 
     def predict(self, X_test):
         """
@@ -1042,7 +1064,6 @@ class MyRandomForestClassifier:
             class_counts[label] += 1
         
         # determine the majority class
-        max_count = max(class_counts.values())
         majority_class = max(class_counts, key=class_counts.get)
 
         return majority_class
