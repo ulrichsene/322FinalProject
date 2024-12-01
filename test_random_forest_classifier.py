@@ -36,19 +36,19 @@ def test_random_forest_classifier_fit():
     assert model.F == 2
     
     # assert that each tree is trained on a different bootstrapped dataset
-    bootstrapped_samples = [tree["data_indices"] for tree in model.trees]
+    bootstrapped_samples = [tree[2] for tree in model.trees]
     assert all(len(set(bootstrapped_samples[i]) & set(bootstrapped_samples[j])) < len(bootstrapped_samples[i])
                for i in range(len(bootstrapped_samples)) for j in range(i + 1, len(bootstrapped_samples)))
     
     # verify that each tree in the ensemble is using a different subset of F
-    feature_subsets = [tree["features"] for tree in model.trees]
+    feature_subsets = [tree[1] for tree in model.trees]
 
     # check if all feature subsets are unique
     assert all(feature_subsets[i] != feature_subsets[j]
                for i in range(len(feature_subsets)) for j in range(i + 1, len(feature_subsets)))
 
     # check all trees in the ensemble are unique
-    tree_signatures = [str(tree) for tree in model.trees]
+    tree_signatures = [str(tree[0]) for tree in model.trees]
     assert len(tree_signatures) == len(set(tree_signatures))
 
 def test_random_forest_classifier_predict():
@@ -59,10 +59,8 @@ def test_random_forest_classifier_predict():
     test_case1 = ["Junior", "Java", "yes", "no"] # true
     test_case2 = ["Junior", "Java", "yes", "yes"] # false
 
-    desk_prediction= "True"
+    prediction1 = model.predict(test_case1)
+    prediction2 = model.predict(test_case2)
 
-    predictions = model.predict(test_case1)
-
-    assert predictions == desk_prediction
-
-    # n = 10, compute bagging samples, produces 10 lists, each list has [bootstrap sample (trees training set), out of bag sample (used for testing) ]
+    assert prediction1 == "True"
+    assert prediction2 == "False"

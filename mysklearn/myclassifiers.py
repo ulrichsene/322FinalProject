@@ -984,6 +984,8 @@ class MyRandomForestClassifier:
         X_train (list): training feature data.
         y_train (list): training labels.
         """
+
+        np.random.seed(42)
         n_samples = len(X_train)
         n_features = len(X_train[0])
         # keep track of previously used feature subsets to prevent duplicates
@@ -1004,8 +1006,14 @@ class MyRandomForestClassifier:
             bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
 
             # rreate and store the tree
-            tree = {"data_indices": bootstrap_indices, "features": feature_indices}
-            self.trees.append(tree)
+            # tree = {"data_indices": bootstrap_indices, "features": feature_indices}
+            # self.trees.append(tree)
+
+            # create the decision tree classifier and train it on the bootstrap sample and feature subset
+            tree = MyDecisionTreeClassifier()
+            tree.fit(bootstrap_features, bootstrap_y)
+
+            self.trees.append((tree, feature_indices, bootstrap_indices))
 
     def predict(self, X_test):
         """
@@ -1017,9 +1025,14 @@ class MyRandomForestClassifier:
         # collect predictions from each tree (calling the decision tree predict method here)
         all_tree_predictions = []
 
-        for tree in self.trees: # self.trees should already contain the best M trees after calling predict
-            predictions = tree.predict([X_test])
-            all_tree_predictions.append(predictions[0])
+        for tree, feature_indices, __ in self.trees: # by the fit method each tree has the format: (tree, feature indices, bootstrap indices)
+            selected_features = []
+
+            for i in feature_indices:
+                selected_features.append(X_test[i])
+            
+            prediction = tree.predict([selected_features])
+            all_tree_predictions.append(prediction[0])
             
         # perform majority voting here
         class_counts = {}

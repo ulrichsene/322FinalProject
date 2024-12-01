@@ -1,6 +1,5 @@
 import pickle
 from flask import Flask, request, jsonify
-from mysklearn.myclassifiers import MyNaiveBayesClassifier
 
 app = Flask(__name__)
 
