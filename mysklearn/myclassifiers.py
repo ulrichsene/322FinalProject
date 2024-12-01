@@ -978,42 +978,46 @@ class MyRandomForestClassifier:
 
         self.trees = [] # list to hold the individual trees in the forest
 
+    import numpy as np
+
     def fit(self, X_train, y_train):
         """
-        Args:
-        X_train (list): training feature data.
-        y_train (list): training labels.
-        """
+        Trains the Random Forest classifier on the provided dataset.
 
-        np.random.seed(42)
+        Args:
+            X_train (list): The training feature data.
+            y_train (list): The training labels.
+        """
         n_samples = len(X_train)
         n_features = len(X_train[0])
-        # keep track of previously used feature subsets to prevent duplicates
-        used_feature_sets = []
-        
+        used_feature_sets = set()  # To track unique feature subsets
+
         for _ in range(self.N):
-            bootstrap_indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
+            # Bootstrapping: sample with replacement
+            bootstrap_indices = np.random.choice(range(n_samples), size=n_samples, replace=True).tolist()
             bootstrap_X = [X_train[i] for i in bootstrap_indices]
             bootstrap_y = [y_train[i] for i in bootstrap_indices]
 
-            # feature subset: Randomly pick F features for this tree, ensuring uniqueness
-            while True:
-                feature_indices = random.sample(range(n_features), self.F)
-                if feature_indices not in used_feature_sets:
-                    used_feature_sets.append(feature_indices)
+            # Feature subset selection: Randomly pick F features for this tree
+            feature_indices = None
+            for _ in range(10):  # Attempt a maximum of 10 times for diversity
+                candidate_features = tuple(np.random.choice(range(n_features), size=self.F, replace=False).tolist())
+                if candidate_features not in used_feature_sets:
+                    feature_indices = candidate_features
+                    used_feature_sets.add(feature_indices)
                     break
-            
+            if feature_indices is None:
+                feature_indices = tuple(np.random.choice(range(n_features), size=self.F, replace=False).tolist())
+
+            # Prepare bootstrap feature subset
             bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
 
-            # rreate and store the tree
-            # tree = {"data_indices": bootstrap_indices, "features": feature_indices}
-            # self.trees.append(tree)
-
-            # create the decision tree classifier and train it on the bootstrap sample and feature subset
+            # Create and train a decision tree classifier
             tree = MyDecisionTreeClassifier()
             tree.fit(bootstrap_features, bootstrap_y)
 
-            self.trees.append((tree, feature_indices, bootstrap_indices))
+            # Store the trained tree, feature indices, and bootstrap indices
+            self.trees.append((tree, list(feature_indices), bootstrap_indices))
 
     def predict(self, X_test):
         """
@@ -1044,5 +1048,10 @@ class MyRandomForestClassifier:
         # determine the majority class
         max_count = max(class_counts.values())
         majority_class = max(class_counts, key=class_counts.get)
+        print("class counts", class_counts)
+        print("max count", max_count)
+        # print("tree count", self.trees)
+        print("M", self.M)
 
         return majority_class
+
