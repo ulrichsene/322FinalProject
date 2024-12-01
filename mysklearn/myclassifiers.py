@@ -10,8 +10,9 @@
 
 import operator
 import numpy as np
-from mysklearn import utils
+from mysklearn import utils, myevaluation
 import math
+import random
 
 class MySimpleLinearRegressor:
     """Represents a simple linear regressor.
@@ -961,7 +962,7 @@ class MyDecisionTreeClassifier:
                     self.print_decision_rules(node = subtree, conditions = updated_conditions, attribute_names = attribute_names, class_name = class_name)
 
 class MyRandomForestClassifier:
-    def __init__(self, M, N, F):
+    def __init__(self, N, M, F):
         """
             Initializes a RandomForest classifier
 
@@ -971,14 +972,40 @@ class MyRandomForestClassifier:
             - F (?): the subset of attributes to use?
         """
 
-        self.M = M
         self.N = N
+        self.M = M
         self.F = F
-        
+
         self.trees = [] # list to hold the individual trees in the forest
 
     def fit(self, X_train, y_train):
-        pass
+        """
+        Args:
+        X_train (list): training feature data.
+        y_train (list): training labels.
+        """
+        n_samples = len(X_train)
+        n_features = len(X_train[0])
+        # keep track of previously used feature subsets to prevent duplicates
+        used_feature_sets = []
+        
+        for _ in range(self.N):
+            bootstrap_indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
+            bootstrap_X = [X_train[i] for i in bootstrap_indices]
+            bootstrap_y = [y_train[i] for i in bootstrap_indices]
+
+            # feature subset: Randomly pick F features for this tree, ensuring uniqueness
+            while True:
+                feature_indices = random.sample(range(n_features), self.F)
+                if feature_indices not in used_feature_sets:
+                    used_feature_sets.append(feature_indices)
+                    break
+            
+            bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
+
+            # rreate and store the tree
+            tree = {"data_indices": bootstrap_indices, "features": feature_indices}
+            self.trees.append(tree)
 
     def predict(self, X_test):
         """
@@ -1006,5 +1033,3 @@ class MyRandomForestClassifier:
         majority_class = max(class_counts, key=class_counts.get)
 
         return majority_class
-
-

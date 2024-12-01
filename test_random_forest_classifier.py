@@ -24,21 +24,32 @@ X_train_interview = [
 y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
 
 def test_random_forest_classifier_fit():
+    # N = number of trees, M = features, F = features per split
     model = MyRandomForestClassifier(N=5, M=3, F=2)
     model.fit(X_train_interview, y_train_interview)
-    desk_m = 3
+    
+    # check the correct number of trees (N) were created in the ensemble
+    assert len(model.trees) == model.N 
+    
+    # check that M and F are set correctly
+    assert model.M == 3
+    assert model.F == 2
+    
+    # assert that each tree is trained on a different bootstrapped dataset
+    bootstrapped_samples = [tree["data_indices"] for tree in model.trees]
+    assert all(len(set(bootstrapped_samples[i]) & set(bootstrapped_samples[j])) < len(bootstrapped_samples[i])
+               for i in range(len(bootstrapped_samples)) for j in range(i + 1, len(bootstrapped_samples)))
+    
+    # verify that each tree in the ensemble is using a different subset of F
+    feature_subsets = [tree["features"] for tree in model.trees]
 
-    assert model.M == desk_m
-    assert model.F != model.F
-    assert model.F != model.F
-    assert model.F != model.F
-    # check that the ensemble is correct m = m, f = f, check that each pair of the two trees in the ensemble are different
-# hard code m = 3
-    # assert that the correct number of trees (M) were selected
+    # check if all feature subsets are unique
+    assert all(feature_subsets[i] != feature_subsets[j]
+               for i in range(len(feature_subsets)) for j in range(i + 1, len(feature_subsets)))
 
-    # assert that the bootstrapping was successful (each tree trained on a different sample set)
-
-    # assert that each tree used a different subset of features (F)
+    # check all trees in the ensemble are unique
+    tree_signatures = [str(tree) for tree in model.trees]
+    assert len(tree_signatures) == len(set(tree_signatures))
 
 def test_random_forest_classifier_predict():
     model = MyRandomForestClassifier(N =5, M =3, F = 2)
