@@ -1,5 +1,6 @@
 
 import numpy as np
+import random
 from mysklearn.myclassifiers import MyRandomForestClassifier
 from mysklearn import utils
 
@@ -25,8 +26,15 @@ y_train_interview = ["False", "False", "True", "True", "True", "False", "True", 
 
 def test_random_forest_classifier_fit():
     # N = number of trees, M = features, F = features per split
+    # seed random generator here:
+    random.seed(0)
     model = MyRandomForestClassifier(N=5, M=3, F=2)
     model.fit(X_train_interview, y_train_interview)
+
+    for idx, (dt, features, indices) in enumerate(model.trees, start=1):
+        print(f"Tree {idx}:")
+        print(dt.tree)
+        print("-" * 40)
     
     # check the correct number of trees (N) were created in the ensemble
     assert len(model.trees) == model.M
@@ -63,6 +71,15 @@ def test_random_forest_classifier_predict():
     print(prediction1)
     prediction2 = model.predict(test_case2)
     print(prediction2)
+
+    # tree 1 from fit:
+    ['Attribute', 1, ['Value', 'no', ['Leaf', 'False', 5, 14]], ['Value', 'yes', ['Leaf', 'True', 9, 14]]]
+
+    # tree 2 from fit:
+    ['Attribute', 0, ['Value', 'Junior', ['Leaf', 'True', 5, 14]], ['Value', 'Mid', ['Leaf', 'True', 7, 14]], ['Value', 'Senior', ['Attribute', 1, ['Value', 'no', ['Leaf', 'False', 1, 2]], ['Value', 'yes', ['Leaf', 'True', 1, 2]]]]]
+
+    # tree 3 from fit:
+    ['Attribute', 1, ['Value', 'Java', ['Leaf', 'False', 2, 14]], ['Value', 'Python', ['Attribute', 0, ['Value', 'no', ['Leaf', 'False', 14, 3]], ['Value', 'yes', ['Leaf', 'False', 14, 3]]]], ['Value', 'R', ['Attribute', 0, ['Value', 'no', ['Leaf', 'True', 2, 6]], ['Value', 'yes', ['Leaf', 'False', 14, 4]]]]]
 
     assert prediction1 == "True"
     assert prediction2 == "False"
