@@ -28,12 +28,13 @@ def predict():
     model = load_model()
 
     # should make the prediction using the naive bayes model's predict method
-    pred = model.predict(instance)
+    pred = model.predict(instance)[0]
+    print("pred is: ", pred)
 
     if pred is not None:
-        return jsonify({"prediction (1 = diabetes, 0 = no diabetes):", pred}), 200
+        return jsonify({"prediction (1 = diabetes, 0 = no diabetes)": pred}), 200
     # if something went wrong
     return "Error making a prediction", 400
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port = 5001, debug = False)
+    app.run(host="0.0.0.0", port = 5001, debug = True)

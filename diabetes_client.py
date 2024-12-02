@@ -2,7 +2,7 @@ import requests
 import json
 
 # sample url with "unseen instance"
-url = "http://127.0.0.1:5001/predict?age=22&HbA1c_level=5.5&blood_glucose_level=110&gender=Female&hypertension=0.0&heart_disease=0.0"
+url = "http://127.0.0.1:5001/predict?age=22&a1c_level=5.5&glucose_level=110&gender=Female&hypertension=0.0&heart_disease=0.0"
 
 response = requests.get(url = url)
 
