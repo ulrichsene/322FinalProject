@@ -1184,61 +1184,61 @@ class MyDecisionTreeClassifier:
         traverse_tree(self.tree, [])
 
     # BONUS method
-    def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):
-        """Visualizes a tree via the open source Graphviz graph visualization package and
-        its DOT graph language (produces .dot and .pdf files).
+    # def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):
+    #     """Visualizes a tree via the open source Graphviz graph visualization package and
+    #     its DOT graph language (produces .dot and .pdf files).
 
-        Args:
-            dot_fname(str): The name of the .dot output file.
-            pdf_fname(str): The name of the .pdf output file generated from the .dot file.
-            attribute_names(list of str or None): A list of attribute names to use in the decision rules
-                (None if a list is not provided and the default attribute names based on indexes
-                (e.g. "att0", "att1", ...) should be used).
+    #     Args:
+    #         dot_fname(str): The name of the .dot output file.
+    #         pdf_fname(str): The name of the .pdf output file generated from the .dot file.
+    #         attribute_names(list of str or None): A list of attribute names to use in the decision rules
+    #             (None if a list is not provided and the default attribute names based on indexes
+    #             (e.g. "att0", "att1", ...) should be used).
 
-        Notes:
-            Graphviz: https://graphviz.org/
-            DOT language: https://graphviz.org/doc/info/lang.html
-            You will need to install graphviz in the Docker container as shown in class to complete this method.
-        """
-        def traverse_tree_dot(tree, dot, parent_node=None, edge_label=""):
-            """Recursively traverses the tree to construct DOT nodes and edges."""
-            node_type = tree[0]
+    #     Notes:
+    #         Graphviz: https://graphviz.org/
+    #         DOT language: https://graphviz.org/doc/info/lang.html
+    #         You will need to install graphviz in the Docker container as shown in class to complete this method.
+    #     """
+    #     def traverse_tree_dot(tree, dot, parent_node=None, edge_label=""):
+    #         """Recursively traverses the tree to construct DOT nodes and edges."""
+    #         node_type = tree[0]
 
-            if node_type == "Leaf":
-                # create label including quantities
-                label = f"Leaf: {tree[1]} ({tree[2]}/{tree[3]})"
-                leaf_node_id = f"leaf_{id(tree)}"  # unique node for each  true/false
-                dot.node(leaf_node_id, label=label, shape="ellipse")
-                if parent_node is not None:
-                    dot.edge(parent_node, leaf_node_id, label=edge_label)
-                return
+    #         if node_type == "Leaf":
+    #             # create label including quantities
+    #             label = f"Leaf: {tree[1]} ({tree[2]}/{tree[3]})"
+    #             leaf_node_id = f"leaf_{id(tree)}"  # unique node for each  true/false
+    #             dot.node(leaf_node_id, label=label, shape="ellipse")
+    #             if parent_node is not None:
+    #                 dot.edge(parent_node, leaf_node_id, label=edge_label)
+    #             return
 
-            elif node_type == "Attribute":
-                # attribute node with the attribute name
-                attribute_index = int(tree[1].replace("att", ""))
-                attribute_name = (
-                    attribute_names[attribute_index]
-                    if attribute_names is not None
-                    else f"att{attribute_index}"
-                )
-                attribute_node_id = f"att_{id(tree)}"  # unique node for each true/false
-                dot.node(attribute_node_id, label=attribute_name, shape="box")
-                if parent_node is not None:
-                    dot.edge(parent_node, attribute_node_id, label=edge_label)
+    #         elif node_type == "Attribute":
+    #             # attribute node with the attribute name
+    #             attribute_index = int(tree[1].replace("att", ""))
+    #             attribute_name = (
+    #                 attribute_names[attribute_index]
+    #                 if attribute_names is not None
+    #                 else f"att{attribute_index}"
+    #             )
+    #             attribute_node_id = f"att_{id(tree)}"  # unique node for each true/false
+    #             dot.node(attribute_node_id, label=attribute_name, shape="box")
+    #             if parent_node is not None:
+    #                 dot.edge(parent_node, attribute_node_id, label=edge_label)
 
-                # process each value and its corresponding subtree
-                for subtree in tree[2:]:
-                    value_label = f"{subtree[1]}"
-                    traverse_tree_dot(subtree[2], dot, parent_node=attribute_node_id, edge_label=value_label)
+    #             # process each value and its corresponding subtree
+    #             for subtree in tree[2:]:
+    #                 value_label = f"{subtree[1]}"
+    #                 traverse_tree_dot(subtree[2], dot, parent_node=attribute_node_id, edge_label=value_label)
 
-        # Graphviz Digraph
-        dot = graphviz.Digraph(format="pdf", engine='dot')
+    #     # Graphviz Digraph
+    #     dot = graphviz.Digraph(format="pdf", engine='dot')
 
-        # traverse the decision tree for graph
-        traverse_tree_dot(self.tree, dot)
+    #     # traverse the decision tree for graph
+    #     traverse_tree_dot(self.tree, dot)
 
-        dot.render(dot_fname, view=False)
-        dot.render(pdf_fname, view=True)
+    #     dot.render(dot_fname, view=False)
+    #     dot.render(pdf_fname, view=True)
 
 class MyRandomForestClassifier:
     def __init__(self, N, M, F):
