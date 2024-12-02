@@ -608,6 +608,7 @@ class MyNaiveBayesClassifier:
 #         # this is group by attribute domain (not values of attribute in instances)
 #         # lets use dictionaries
 #         att_index = self.header.index(attribute)
+        print("header:", self.header)
 #         att_domain = self.attribute_domains[attribute]
 #         partitions = {}
 #         for att_value in att_domain: # "Junior" -> "Mid" -> "Senior"
