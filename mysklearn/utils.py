@@ -5,6 +5,7 @@ from collections import defaultdict
 from tabulate import tabulate
 from mysklearn.mypytable import MyPyTable
 from mysklearn import myevaluation
+import math
 
 def get_column(table, header, col_name):
     """Extracts a column from the table data as a list.
@@ -757,3 +758,128 @@ def prepare_mixed_data():
    diabetes = data.get_column("diabetes")
    
    return X, diabetes
+
+def calculate_entropy(instances, attributes):
+    # fix this
+    """ Calculates entropy for a given attribute of target values. """
+    entropies = []
+    class_labels = [instance[-1] for instance in instances]
+    unique_class_labels = list(list(np.unique(class_labels)))
+    # print("unique class labels:", unique_class_labels)
+
+    for attribute in attributes:
+        att_entropies = []
+        unique_att_counts = []
+        att_index = int(attribute[-1])
+        att_values = [instance[att_index] for instance in instances]
+        unique_att_vals, unique_att_counts = np.unique(att_values, return_counts=True)
+
+        # Calculate entropy
+        for index, value in enumerate(unique_att_vals):
+            class_counts = []
+            # print("value:", value)
+            for i in range(len(unique_class_labels)):
+                class_counts.append(0)
+            #print("len of class counts: ", len(class_counts))
+            for instance in instances:
+                if instance[att_index] == value:
+                    #print("index ", class_labels.index(instance[-1]))
+                    class_counts[unique_class_labels.index(instance[-1])] += 1
+            # print("class counts:", class_counts)
+            entropy = 0
+            if 0 not in class_counts:
+                for count in class_counts:
+                    probability = count / unique_att_counts[index]
+                    # print("probability:", probability)
+                    entropy -= probability * (math.log2(probability)) # if probability > 0 else 0
+            att_entropies.append(entropy)
+        # print("att entropies:", att_entropies)
+        att_entropy = 0
+
+        # Calculate Enew
+        for index, entropy_val in enumerate(att_entropies):
+            att_entropy += (unique_att_counts[index] / len(instances)) * entropy_val
+        entropies.append(att_entropy)
+
+        #print(f"For attribute index {attribute}, entropy: {att_entropy}")
+    return entropies
+
+def partition_instances(header, instances, attribute, attribute_domains):
+    """ Helper function that partitions instances by attribute domain.
+
+    Args:
+        header (list of str): used to find att index
+        instances (2D list): data used in partitions
+        attribute (int or str): what is being split on
+        attribute_domains (dictionary): all of the groups
+
+    Returns:
+        partitions (dictionary): instances divided by attribute
+    
+    """
+    # this is group by attribute domain (not values of attribute in instances)
+    # lets use dictionaries
+    att_index = header.index(attribute)
+    att_domain = attribute_domains[attribute]
+    # print("att domain in partition: ", att_domain)
+    partitions = {}
+    for att_value in att_domain: # "Junior" -> "Mid" -> "Senior"
+        partitions[att_value] = []
+        for instance in instances:
+            if instance[att_index] == att_value:
+                partitions[att_value].append(instance)
+
+    return partitions
+
+def all_same_class(instances):
+    """ Determines if all same instances belong to same class.
+
+    Args:
+        instances (list): values to be checked
+
+    Returns:
+        true/false (boolean): if condition is met
+    """
+    first_class = instances[0][-1]
+    for instance in instances:
+        if instance[-1] != first_class:
+            return False
+    # get here, then all same class labels
+    return True
+
+def majority_vote(instances, previous_instances=None):
+    """ Returns the majority class label.
+
+    Args:
+        instances (list): data
+        previous_instances (list): data from prev partition
+
+    Returns:
+        majority_label (str): class label
+        len of instances (int): number of instances to count    
+    """
+    if previous_instances:
+        total_instances = previous_instances
+    else:
+        total_instances = instances
+    # print("previous instances:", total_instances)
+    class_labels = [instance[-1] for instance in total_instances]
+    label_counts = {}
+
+    # Count occurrences of each label
+    for label in class_labels:
+        if label not in label_counts:
+            label_counts[label] = 0
+        label_counts[label] += 1
+
+    # Find the maximum count and resolve clashes
+    max_count = max(label_counts.values())
+    majority_labels = [label for label, count in label_counts.items() if count == max_count]
+
+    if len(majority_labels) > 1:
+        # print("min majority label: ", min(majority_labels))
+        return min(majority_labels), len(total_instances)  # Return the first in alphabetical order
+
+    # print("majority label:", majority_labels[0])
+
+    return majority_labels[0], len(total_instances)
