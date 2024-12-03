@@ -1231,14 +1231,14 @@ class MyDecisionTreeClassifier:
     #                 value_label = f"{subtree[1]}"
     #                 traverse_tree_dot(subtree[2], dot, parent_node=attribute_node_id, edge_label=value_label)
 
-    #     # Graphviz Digraph
-    #     dot = graphviz.Digraph(format="pdf", engine='dot')
+        # # Graphviz Digraph
+        # dot = graphviz.Digraph(format="pdf", engine='dot')
 
-    #     # traverse the decision tree for graph
-    #     traverse_tree_dot(self.tree, dot)
+        # # traverse the decision tree for graph
+        # traverse_tree_dot(self.tree, dot)
 
-    #     dot.render(dot_fname, view=False)
-    #     dot.render(pdf_fname, view=True)
+        # dot.render(dot_fname, view=False)
+        # dot.render(pdf_fname, view=True)
 
 class MyRandomForestClassifier:
     def __init__(self, N, M, F):
