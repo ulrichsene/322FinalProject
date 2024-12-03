@@ -860,46 +860,46 @@ class MyNaiveBayesClassifier:
 
 #         return self.tree
 
-#     def predict(self, X_test):
-#         """Makes predictions for test instances in X_test.
+    # def predict(self, X_test):
+    #     """Makes predictions for test instances in X_test.
 
-#         Args:
-#             X_test(list of list of obj): The list of testing samples
-#                 The shape of X_test is (n_test_samples, n_features)
+    #     Args:
+    #         X_test(list of list of obj): The list of testing samples
+    #             The shape of X_test is (n_test_samples, n_features)
 
-#         Returns:
-#             y_predicted(list of obj): The predicted target y values (parallel to X_test)
-#         """
-#         y_predicted = [] # will store the returned predictions
+    #     Returns:
+    #         y_predicted(list of obj): The predicted target y values (parallel to X_test)
+    #     """
+    #     y_predicted = [] # will store the returned predictions
 
-#         for instance in X_test: # loops through each test instance in X_test
-#             node = self.tree # start at root of decision tree
+    #     for instance in X_test: # loops through each test instance in X_test
+    #         node = self.tree # start at root of decision tree
 
-#             # go through the tree until reach a leaf node (will have prediction)
-#             while isinstance(node, list): # continues along the tree if node is a list (means its not a leaf node)
-#                 if node[0] == "Leaf":
-#                     # if the node is a leaf, append the class label to predictions
-#                     y_predicted.append(node[1]) # format: ["Leaf", class_label, count, total_count]
-#                     break # exit loop, don't need to go any further
-#                 elif node[0] == "Attribute":
-#                     # find the attribute to split on - format: ["Attribute", attribute_index, attribute_value]
-#                     attribute_index = node[1]
-#                     attribute_value = instance[attribute_index]
+    #         # go through the tree until reach a leaf node (will have prediction)
+    #         while isinstance(node, list): # continues along the tree if node is a list (means its not a leaf node)
+    #             if node[0] == "Leaf":
+    #                 # if the node is a leaf, append the class label to predictions
+    #                 y_predicted.append(node[1]) # format: ["Leaf", class_label, count, total_count]
+    #                 break # exit loop, don't need to go any further
+    #             elif node[0] == "Attribute":
+    #                 # find the attribute to split on - format: ["Attribute", attribute_index, attribute_value]
+    #                 attribute_index = node[1]
+    #                 attribute_value = instance[attribute_index]
 
-#                     found = False
-#                     for partition in node[2:]: # loops over paritions to find subtree that corresponds to current attribute value
-#                         if partition[0] == "Value" and partition[1] == attribute_value:
-#                             node = partition[2] # move to the subtree for this value
-#                             found = True
-#                             break # exit the loop since correct parition is found
+    #                 found = False
+    #                 for partition in node[2:]: # loops over paritions to find subtree that corresponds to current attribute value
+    #                     if partition[0] == "Value" and partition[1] == attribute_value:
+    #                         node = partition[2] # move to the subtree for this value
+    #                         found = True
+    #                         break # exit the loop since correct parition is found
                     
-#                     # if no matching parition was found, use majority voting
-#                     if not found:
-#                         majority_class = self.majority_vote(instance)
-#                         y_predicted.append(majority_class)
-#                         break
+    #                 # if no matching parition was found, use majority voting
+    #                 if not found:
+    #                     majority_class = self.majority_vote(instance)
+    #                     y_predicted.append(majority_class)
+    #                     break
 
-#         return y_predicted
+    #     return y_predicted
 
 
 #     def print_decision_rules(self, node=None, conditions=None, attribute_names=None, class_name="class"):
@@ -985,19 +985,27 @@ class MyDecisionTreeClassifier:
         self.y_train = None
         self.tree = None
 
-    def tdidt(self, current_instances, available_attributes, domains, previous_instances=None):
+    def tdidt(self, current_instances, available_attributes, domains, previous_instances=None, F=None):
         """Recursively builds a decision tree using the TDIDT algorithm."""
 
         if previous_instances is None:
             previous_instances = current_instances
 
+        if F is not None:
+            available_attributes_copy = available_attributes.copy()
+            np.random.shuffle(available_attributes_copy)
+            available_attributes = available_attributes_copy[:F]
+
         # Get domains for the current instances (possible values for each attribute)
         # domains = self.attribute_domains(current_instances)
         # print("domains: ", domains)
+            
+        print("avail attr", available_attributes)
 
         # Calculate entropy for each attribute and choose the one with the least entropy
         entropies = utils.calculate_entropy(current_instances, available_attributes)
         split_attribute = available_attributes[entropies.index(min(entropies))]
+
         available_attributes.remove(split_attribute)  # Remove the attribute after use
 
         # print("Attribute splitting on:", split_attribute)
@@ -1043,7 +1051,7 @@ class MyDecisionTreeClassifier:
 
         return tree
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, F=None):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
 
@@ -1075,7 +1083,7 @@ class MyDecisionTreeClassifier:
         self.header = [f"att{i}" for i in range(len(X_train[0]))]
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         domains = self.attribute_domains(train)
-        self.tree = self.tdidt(train, self.header.copy(), domains)
+        self.tree = self.tdidt(train, self.header.copy(), domains, F=F)
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -1104,6 +1112,8 @@ class MyDecisionTreeClassifier:
 
                 # If it's an Attribute node, find the matching branch
                 attribute_index = self.header.index(current_tree[1])  # Get the index of the attribute in the test instance
+                print("attr index", attribute_index)
+                print("test instance", test_instance)
                 test_value = test_instance[attribute_index]
 
                 # Find the subtree corresponding to the test value
@@ -1117,6 +1127,48 @@ class MyDecisionTreeClassifier:
                     break
 
         return y_predicted
+        
+    # def predict(self, X_test):
+    #     """Makes predictions for test instances in X_test.
+
+    #     Args:
+    #         X_test(list of list of obj): The list of testing samples
+    #             The shape of X_test is (n_test_samples, n_features)
+
+    #     Returns:
+    #         y_predicted(list of obj): The predicted target y values (parallel to X_test)
+    #     """
+    #     y_predicted = [] # will store the returned predictions
+
+    #     for instance in X_test: # loops through each test instance in X_test
+    #         node = self.tree # start at root of decision tree
+
+    #         # go through the tree until reach a leaf node (will have prediction)
+    #         while isinstance(node, list): # continues along the tree if node is a list (means its not a leaf node)
+    #             if node[0] == "Leaf":
+    #                 # if the node is a leaf, append the class label to predictions
+    #                 y_predicted.append(node[1]) # format: ["Leaf", class_label, count, total_count]
+    #                 break # exit loop, don't need to go any further
+    #             elif node[0] == "Attribute":
+    #                 # find the attribute to split on - format: ["Attribute", attribute_index, attribute_value]
+    #                 attribute_index = node[1]
+    #                 # print("attr index:", attribute_index[3])
+    #                 attribute_value = instance[int(attribute_index[3])]
+
+    #                 found = False
+    #                 for partition in node[2:]: # loops over paritions to find subtree that corresponds to current attribute value
+    #                     if partition[0] == "Value" and partition[1] == attribute_value:
+    #                         node = partition[2] # move to the subtree for this value
+    #                         found = True
+    #                         break # exit the loop since correct parition is found
+                    
+    #                 # if no matching parition was found, use majority voting
+    #                 if not found:
+    #                     majority_class = utils.majority_vote(instance)
+    #                     y_predicted.append(majority_class)
+    #                     break
+
+    #     return y_predicted
 
     def attribute_domains(self, instances):
         """
@@ -1241,7 +1293,7 @@ class MyDecisionTreeClassifier:
         # dot.render(pdf_fname, view=True)
 
 class MyRandomForestClassifier:
-    def __init__(self, N, M, F):
+    def __init__(self, N, M, F, seed_random=False):
         """
             Initializes a RandomForest classifier
 
@@ -1254,78 +1306,83 @@ class MyRandomForestClassifier:
         self.N = N
         self.M = M
         self.F = F
+        self.seed_random = seed_random
 
         self.trees = [] # list to hold the individual trees in the forest
 
-    def fit(self, X_train, y_train, random_seed=None):
+    def fit(self, X_train, y_train):
         """
         Args:
         X_train (list): training feature data.
         y_train (list): training labels.
         """
-        if random_seed is None:
-            random.seed(0)
-        else:
-            random.seed(random_seed)
-
         n_samples = len(X_train)
         n_features = len(X_train[0])
         # keep track of previously used feature subsets to prevent duplicates
         used_feature_sets = []
+        print("y_train", y_train)
 
         tree_performance = []
         
-        for _ in range(self.N):
+        for i in range(self.N):
+            random_state = None
+            if self.seed_random:
+                random_state = i
+            # else:
+            #     random.seed(None)
             bootstrap_indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
-            bootstrap_X = [X_train[i] for i in bootstrap_indices]
-            bootstrap_y = [y_train[i] for i in bootstrap_indices]
+        #     bootstrap_X = [X_train[i] for i in bootstrap_indices]
+        #     bootstrap_y = [y_train[i] for i in bootstrap_indices]
 
-            # feature subset: Randomly pick F features for this tree, ensuring uniqueness
+        #     # feature subset: Randomly pick F features for this tree, ensuring uniqueness
+        #     while True:
+        #         feature_indices = random.sample(range(n_features), self.F)
+        #         if feature_indices not in used_feature_sets:
+        #             used_feature_sets.append(feature_indices)
+        #             break
+            
+        #     bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
+
+            bootstrap_X, out_of_bag_X, bootstrap_y, out_of_bag_y = myevaluation.bootstrap_sample(X_train, y_train, random_state=random_state)
             while True:
                 feature_indices = random.sample(range(n_features), self.F)
                 if feature_indices not in used_feature_sets:
                     used_feature_sets.append(feature_indices)
                     break
-            
-            bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
-
-            # rreate and store the tree
-            # tree = {"data_indices": bootstrap_indices, "features": feature_indices}
-            # self.trees.append(tree)
 
             # create the decision tree classifier and train it on the bootstrap sample and feature subset
+            # print("whyyyyyyyyy")
+            # print("bootstrap y: ", bootstrap_y)
             tree = MyDecisionTreeClassifier()
-            tree.fit(bootstrap_features, bootstrap_y)
+            tree.fit(bootstrap_X, bootstrap_y, F=self.F)
 
-            predictions = []
+            # predictions = []
 
-            if X_train is not None and y_train is not None:
-                for row in X_train:
-                    selected_features = []
-                    for i in feature_indices:
-                        selected_features.append(row[i])
-                    predictions.append(tree.predict([selected_features]))
-                    print("row:", row)
-                    print("sel features:", selected_features)
-                 
-                accuracy = myevaluation.accuracy_score(y_train, predictions)
-                print("predictions:", predictions)
-                print("accuracy in loop:", accuracy)
-            else:
-                accuracy = 0.0
+            # if X_train is not None and y_train is not None:
+            #     for row in X_train:
+            #         selected_features = []
+            #         for i in feature_indices:
+            #             selected_features.append(row[i])
+            #         predictions.append(tree.predict([selected_features]))
+            #         print("row:", row)
+            #         print("sel features:", selected_features)
+            y_pred = tree.predict(out_of_bag_X)
+            accuracy = myevaluation.accuracy_score(out_of_bag_y, y_pred)
+            # print("predictions:", predictions)
+            # print("accuracy in loop:", accuracy)
+            # else:
+            #     accuracy = 0.0
 
-            tree_performance.append((accuracy, tree, feature_indices, bootstrap_indices))
+            tree_performance.append((accuracy, tree))
 
             # sort the trees by accuracy in descending order 
             tree_performance.sort(reverse=True, key=itemgetter(0))
             self.trees = []
 
-            for __, tree, feature_indices, bootstrap_indices in tree_performance[:self.M]:
-                self.trees.append((tree, feature_indices, bootstrap_indices))
+            for __, tree in tree_performance[:self.M]:
+                self.trees.append(tree)
 
             print("Tree in forest:", tree.tree)
-            print("features", feature_indices)
-            print("bootstrap indices:", bootstrap_indices)
             print("accuracy:", accuracy)
 
     def predict(self, X_test):
@@ -1338,23 +1395,28 @@ class MyRandomForestClassifier:
         # collect predictions from each tree (calling the decision tree predict method here)
         all_tree_predictions = []
 
-        for tree, feature_indices, __ in self.trees: # by the fit method each tree has the format: (tree, feature indices, bootstrap indices)
-            selected_features = []
+        for test_val in X_test:
+            tree_preds = []
 
-            for i in feature_indices:
-                selected_features.append(X_test[i])
-            
-            prediction = tree.predict([selected_features])
-            all_tree_predictions.append(prediction[0])
-            
-        # perform majority voting here
-        class_counts = {}
-        for label in all_tree_predictions:
-            if label not in class_counts:
-                class_counts[label] = 0
-            class_counts[label] += 1
-        
-        # determine the majority class
-        majority_class = max(class_counts, key=class_counts.get)
+            for tree in self.trees: # by the fit method each tree has the format: (tree, feature indices, bootstrap indices)
 
-        return majority_class
+                # for i in feature_indices:
+                #     selected_features.append(X_test[i])
+                
+                prediction = tree.predict([test_val])[0]
+                if prediction is None:
+                    prediction = ""
+                tree_preds.append(prediction)
+                
+            # perform majority voting here
+            class_counts = {}
+            for label in tree_preds:
+                if label not in class_counts.keys():
+                    class_counts[label] = 0
+                class_counts[label] += 1
+            
+            # determine the majority class
+            majority_class = max(class_counts, key=class_counts.get)
+            all_tree_predictions.append(majority_class)
+
+        return all_tree_predictions

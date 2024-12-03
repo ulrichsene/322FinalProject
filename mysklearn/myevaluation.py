@@ -203,6 +203,69 @@ def stratified_kfold_split(X, y, n_splits=5, random_state=None, shuffle=False):
 
     return stratified_folds
 
+# def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
+#     """Split dataset into bootstrapped training set and out of bag test set.
+
+#     Args:
+#         X(list of list of obj): The list of samples
+#         y(list of obj): The target y values (parallel to X)
+#             Default is None (in this case, the calling code only wants to sample X)
+#         n_samples(int): Number of samples to generate. If left to None (default) this is automatically
+#             set to the first dimension of X.
+#         random_state(int): integer used for seeding a random number generator for reproducible results
+
+#     Returns:
+#         X_sample(list of list of obj): The list of samples
+#         X_out_of_bag(list of list of obj): The list of "out of bag" samples (e.g. left-over samples)
+#         y_sample(list of obj): The list of target y values sampled (parallel to X_sample)
+#             None if y is None
+#         y_out_of_bag(list of obj): The list of target y values "out of bag" (parallel to X_out_of_bag)
+#             None if y is None
+#     Notes:
+#         Loosely based on sklearn's resample():
+#             https://scikit-learn.org/stable/modules/generated/sklearn.utils.resample.html
+#         Sample indexes of X with replacement, then build X_sample and X_out_of_bag
+#             as lists of instances using sampled indexes (use same indexes to build
+#             y_sample and y_out_of_bag)
+#     """
+
+#     # sets the random seed after checking if random_state is provided
+#     # if random_state:
+#     random.seed(random_state)
+#     # else:
+#     #     random.seed(0)
+#     # determine the number of samples (n_samples) if not provided
+#     if n_samples is None:
+#         n_samples = len(X)
+#     # initialize empty lists
+#     X_sample = [] # stores bootstrapped training samples
+#     X_out_of_bag = [] # stores out-of-bag test samples
+#     y_sample = [] # stores bootstrapped target values (if y is not none)
+#     y_out_of_bag = [] # stores out-of-bag target values (if y is not none)
+
+#     # need a set to track the unique indexes that were selected
+#     selected_indexes = set()
+
+#     # use loop to generate the bootstrap sample (training and target) with replacement
+#     for _ in range(n_samples):
+#         index = random.randint(0, len(X) - 1)
+#         X_sample.append(X[index])
+#         if y is not None:
+#             y_sample.append(y[index])
+#         selected_indexes.add(index)
+
+#     # use loop to create out-of-bag samples
+#     for i in range(len(X)):
+#         if i not in selected_indexes:
+#             X_out_of_bag.append(X[i])
+#             if y is not None:
+#                 y_out_of_bag.append(y[i])
+
+#     if y is not None:
+#         return X_sample, X_out_of_bag, y_sample, y_out_of_bag
+#     else:
+#         return X_sample, X_out_of_bag, None, None
+
 def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
     """Split dataset into bootstrapped training set and out of bag test set.
 
@@ -229,42 +292,24 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
             y_sample and y_out_of_bag)
     """
 
-    # sets the random seed after checking if random_state is provided
-    if random_state:
-        random.seed(random_state)
-    else:
-        random.seed(49)
-    # determine the number of samples (n_samples) if not provided
     if n_samples is None:
         n_samples = len(X)
-    # initialize empty lists
-    X_sample = [] # stores bootstrapped training samples
-    X_out_of_bag = [] # stores out-of-bag test samples
-    y_sample = [] # stores bootstrapped target values (if y is not none)
-    y_out_of_bag = [] # stores out-of-bag target values (if y is not none)
 
-    # need a set to track the unique indexes that were selected
-    selected_indexes = set()
+    rand = np.random.default_rng(seed=random_state)
 
-    # use loop to generate the bootstrap sample (training and target) with replacement
-    for _ in range(n_samples):
-        index = random.randint(0, len(X) - 1)
-        X_sample.append(X[index])
-        if y is not None:
-            y_sample.append(y[index])
-        selected_indexes.add(index)
+    sample_indices = rand.integers(0, len(X), size=n_samples)
+    unique_sample_indices = set(sample_indices)
 
-    # use loop to create out-of-bag samples
-    for i in range(len(X)):
-        if i not in selected_indexes:
-            X_out_of_bag.append(X[i])
-            if y is not None:
-                y_out_of_bag.append(y[i])
+    X_sample = [X[i] for i in sample_indices]
+    X_out_of_bag = [X[i] for i in range(len(X)) if i not in unique_sample_indices]
 
     if y is not None:
-        return X_sample, X_out_of_bag, y_sample, y_out_of_bag
+        y_sample = [y[i] for i in sample_indices]
+        y_out_of_bag = [y[i] for i in range(len(y)) if i not in unique_sample_indices]
     else:
-        return X_sample, X_out_of_bag, None, None
+        y_sample, y_out_of_bag = None, None
+
+    return X_sample, X_out_of_bag, y_sample, y_out_of_bag
 
 
 def confusion_matrix(y_true, y_pred, labels):
