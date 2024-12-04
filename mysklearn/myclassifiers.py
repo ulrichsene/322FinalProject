@@ -1101,6 +1101,7 @@ class MyDecisionTreeClassifier:
         for test_instance in X_test:
             # Start at the root of the tree for each test instance
             current_tree = self.tree
+            print("current tree", self.tree)
 
             while True:
                 node_type = current_tree[0]  # "Leaf" or "Attribute"
@@ -1112,6 +1113,8 @@ class MyDecisionTreeClassifier:
 
                 # If it's an Attribute node, find the matching branch
                 attribute_index = self.header.index(current_tree[1])  # Get the index of the attribute in the test instance
+                print("header", self.header)
+                print("attribute index", attribute_index)
                 # print("attr index", attribute_index)
                 # print("test instance", test_instance)
                 test_value = test_instance[attribute_index]
