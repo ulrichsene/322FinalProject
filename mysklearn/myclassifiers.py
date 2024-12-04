@@ -1000,7 +1000,7 @@ class MyDecisionTreeClassifier:
         # domains = self.attribute_domains(current_instances)
         # print("domains: ", domains)
             
-        print("avail attr", available_attributes)
+        # print("avail attr", available_attributes)
 
         # Calculate entropy for each attribute and choose the one with the least entropy
         entropies = utils.calculate_entropy(current_instances, available_attributes)
@@ -1112,8 +1112,8 @@ class MyDecisionTreeClassifier:
 
                 # If it's an Attribute node, find the matching branch
                 attribute_index = self.header.index(current_tree[1])  # Get the index of the attribute in the test instance
-                print("attr index", attribute_index)
-                print("test instance", test_instance)
+                # print("attr index", attribute_index)
+                # print("test instance", test_instance)
                 test_value = test_instance[attribute_index]
 
                 # Find the subtree corresponding to the test value
@@ -1309,6 +1309,7 @@ class MyRandomForestClassifier:
         self.seed_random = seed_random
 
         self.trees = [] # list to hold the individual trees in the forest
+        self.tree_performance = []
 
     def fit(self, X_train, y_train):
         """
@@ -1322,7 +1323,7 @@ class MyRandomForestClassifier:
         used_feature_sets = []
         print("y_train", y_train)
 
-        tree_performance = []
+        # tree_performance = []
         
         for i in range(self.N):
             random_state = None
@@ -1373,17 +1374,23 @@ class MyRandomForestClassifier:
             # else:
             #     accuracy = 0.0
 
-            tree_performance.append((accuracy, tree))
+            self.tree_performance.append((accuracy, tree))
 
             # sort the trees by accuracy in descending order 
-            tree_performance.sort(reverse=True, key=itemgetter(0))
+            self.tree_performance.sort(reverse=True, key=itemgetter(0))
             self.trees = []
 
-            for __, tree in tree_performance[:self.M]:
+            for __, tree in self.tree_performance[:self.M]:
                 self.trees.append(tree)
 
-            print("Tree in forest:", tree.tree)
-            print("accuracy:", accuracy)
+        #     print("Tree in forest:", tree.tree)
+        #     print("accuracy:", accuracy)
+        # for acc, tree in self.tree_performance:
+        #         print("accuracy", acc)
+        #         print("tree in tree performance", tree.tree)
+
+        # for tree in self.trees:
+        #         print("tree in trees", tree.tree)
 
     def predict(self, X_test):
         """
@@ -1391,7 +1398,6 @@ class MyRandomForestClassifier:
         Args: X_test (test instances)
         Returns: final predictions (majority vote predictions for each test instance)
         """
-
         # collect predictions from each tree (calling the decision tree predict method here)
         all_tree_predictions = []
 
@@ -1399,15 +1405,15 @@ class MyRandomForestClassifier:
             tree_preds = []
 
             for tree in self.trees: # by the fit method each tree has the format: (tree, feature indices, bootstrap indices)
-
                 # for i in feature_indices:
                 #     selected_features.append(X_test[i])
                 
                 prediction = tree.predict([test_val])[0]
+                print("predictions!!!!!!!!!!!!!!!!!!!!", prediction)
                 if prediction is None:
                     prediction = ""
                 tree_preds.append(prediction)
-                
+            
             # perform majority voting here
             class_counts = {}
             for label in tree_preds:
