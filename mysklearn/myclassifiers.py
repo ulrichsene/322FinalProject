@@ -1359,8 +1359,8 @@ class MyRandomForestClassifier:
         self.tree_performance.sort(reverse=True, key=itemgetter(0))
         self.trees = []
 
-        for accuracy, tree in self.tree_performance:
-            print("Acc and tree:", accuracy, tree.tree)
+        # for accuracy, tree in self.tree_performance:
+        #     print("Acc and tree:", accuracy, tree.tree)
 
         for __, tree in self.tree_performance[:self.M]:
             self.trees.append(tree)
@@ -1382,7 +1382,7 @@ class MyRandomForestClassifier:
                 #     selected_features.append(X_test[i])
                 
                 prediction = tree.predict([test_val])[0]
-                print("predictions!!!!!!!!!!!!!!!!!!!!", prediction)
+                # print("predictions!!!!!!!!!!!!!!!!!!!!", prediction)
                 if prediction is None:
                     prediction = ""
                 tree_preds.append(prediction)

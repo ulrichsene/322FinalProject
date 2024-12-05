@@ -30,10 +30,10 @@ def test_random_forest_classifier_fit():
     model = MyRandomForestClassifier(N=5, M=3, F=2, seed_random=4)
     model.fit(X_train_interview, y_train_interview)
 
-    for idx, dt in enumerate(model.trees, start=1):
-        print(f"Tree {idx}:")
-        print(dt.tree)
-        print("-" * 40)
+    # for idx, dt in enumerate(model.trees, start=1):
+    #     print(f"Tree {idx}:")
+    #     print(dt.tree)
+    #     print("-" * 40)
 
     # check the correct number of trees (N) were created in the ensemble
     assert len(model.trees) == model.M
