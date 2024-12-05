@@ -295,22 +295,24 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
     if n_samples is None:
         n_samples = len(X)
 
-    rand = np.random.default_rng(seed=random_state)
+    # Set the random seed for reproducibility
+    if random_state is not None:
+        random.seed(random_state)
 
-    sample_indices = rand.integers(0, len(X), size=n_samples)
-    unique_sample_indices = set(sample_indices)
+    # Sample indices with replacement
+    sample_indices = [random.randint(0, len(X) - 1) for _ in range(n_samples)]
 
+    # Create the bootstrap sample and out-of-bag sample
     X_sample = [X[i] for i in sample_indices]
-    X_out_of_bag = [X[i] for i in range(len(X)) if i not in unique_sample_indices]
+    X_out_of_bag = [X[i] for i in range(len(X)) if i not in sample_indices]
 
     if y is not None:
         y_sample = [y[i] for i in sample_indices]
-        y_out_of_bag = [y[i] for i in range(len(y)) if i not in unique_sample_indices]
+        y_out_of_bag = [y[i] for i in range(len(y)) if i not in sample_indices]
     else:
         y_sample, y_out_of_bag = None, None
 
     return X_sample, X_out_of_bag, y_sample, y_out_of_bag
-
 
 def confusion_matrix(y_true, y_pred, labels):
     """Compute confusion matrix to evaluate the accuracy of a classification.

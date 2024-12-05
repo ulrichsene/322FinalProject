@@ -984,17 +984,17 @@ class MyDecisionTreeClassifier:
         self.X_train = None
         self.y_train = None
         self.tree = None
+        self.used_features = None
 
-    def tdidt(self, current_instances, available_attributes, domains, previous_instances=None, F=None):
+    def tdidt(self, current_instances, available_attributes, domains, previous_instances=None, feature_indices=None):
         """Recursively builds a decision tree using the TDIDT algorithm."""
 
         if previous_instances is None:
             previous_instances = current_instances
 
-        if F is not None:
-            available_attributes_copy = available_attributes.copy()
-            np.random.shuffle(available_attributes_copy)
-            available_attributes = available_attributes_copy[:F]
+        if feature_indices is not None:
+            available_attributes = [available_attributes[indice] for indice in feature_indices]
+            # print("altered avail att", available_attributes)
 
         # Get domains for the current instances (possible values for each attribute)
         # domains = self.attribute_domains(current_instances)
@@ -1051,7 +1051,7 @@ class MyDecisionTreeClassifier:
 
         return tree
 
-    def fit(self, X_train, y_train, F=None):
+    def fit(self, X_train, y_train, feature_indices=None):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
 
@@ -1083,7 +1083,8 @@ class MyDecisionTreeClassifier:
         self.header = [f"att{i}" for i in range(len(X_train[0]))]
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         domains = self.attribute_domains(train)
-        self.tree = self.tdidt(train, self.header.copy(), domains, F=F)
+        # print("domains:", domains)
+        self.tree = self.tdidt(train, self.header.copy(), domains, feature_indices=feature_indices)
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -1101,7 +1102,7 @@ class MyDecisionTreeClassifier:
         for test_instance in X_test:
             # Start at the root of the tree for each test instance
             current_tree = self.tree
-            print("current tree", self.tree)
+            # print("current tree", self.tree)
 
             while True:
                 node_type = current_tree[0]  # "Leaf" or "Attribute"
@@ -1113,8 +1114,8 @@ class MyDecisionTreeClassifier:
 
                 # If it's an Attribute node, find the matching branch
                 attribute_index = self.header.index(current_tree[1])  # Get the index of the attribute in the test instance
-                print("header", self.header)
-                print("attribute index", attribute_index)
+                # print("header", self.header)
+                # print("attribute index", attribute_index)
                 # print("attr index", attribute_index)
                 # print("test instance", test_instance)
                 test_value = test_instance[attribute_index]
@@ -1296,7 +1297,7 @@ class MyDecisionTreeClassifier:
         # dot.render(pdf_fname, view=True)
 
 class MyRandomForestClassifier:
-    def __init__(self, N, M, F, seed_random=False):
+    def __init__(self, N, M, F, seed_random=None):
         """
             Initializes a RandomForest classifier
 
@@ -1320,80 +1321,49 @@ class MyRandomForestClassifier:
         X_train (list): training feature data.
         y_train (list): training labels.
         """
-        n_samples = len(X_train)
         n_features = len(X_train[0])
         # keep track of previously used feature subsets to prevent duplicates
-        used_feature_sets = []
-        print("y_train", y_train)
+        used_feature_sets = set()
+        # print("y_train", y_train)
 
-        # tree_performance = []
+        random.seed(self.seed_random)
         
         for i in range(self.N):
-            random_state = None
-            if self.seed_random:
-                random_state = i
-            # else:
-            #     random.seed(None)
-            bootstrap_indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
-        #     bootstrap_X = [X_train[i] for i in bootstrap_indices]
-        #     bootstrap_y = [y_train[i] for i in bootstrap_indices]
+            # Bootstrap sampling
+            bootstrap_X, out_of_bag_X, bootstrap_y, out_of_bag_y = myevaluation.bootstrap_sample(X_train, y_train, random_state=self.seed_random)
 
-        #     # feature subset: Randomly pick F features for this tree, ensuring uniqueness
-        #     while True:
-        #         feature_indices = random.sample(range(n_features), self.F)
-        #         if feature_indices not in used_feature_sets:
-        #             used_feature_sets.append(feature_indices)
-        #             break
-            
-        #     bootstrap_features = [[row[i] for i in feature_indices] for row in bootstrap_X]
-
-            bootstrap_X, out_of_bag_X, bootstrap_y, out_of_bag_y = myevaluation.bootstrap_sample(X_train, y_train, random_state=random_state)
-            while True:
-                feature_indices = random.sample(range(n_features), self.F)
+            # Find a unique feature subset
+            feature_indices = None
+            max_attempts = 100  # Safety limit for retries
+            attempts = 0
+            while attempts < max_attempts:
+                feature_indices = frozenset(random.sample(range(n_features), self.F))  # Use frozenset for immutability
                 if feature_indices not in used_feature_sets:
-                    used_feature_sets.append(feature_indices)
+                    used_feature_sets.add(feature_indices)
+                    # print("used feature set", used_feature_sets)
+                    # create the decision tree classifier and train it on the bootstrap sample and feature subset
+                    tree = MyDecisionTreeClassifier()
+                    tree.fit(bootstrap_X, bootstrap_y, feature_indices)
+
+                    y_pred = tree.predict(out_of_bag_X)
+                    accuracy = myevaluation.accuracy_score(out_of_bag_y, y_pred)
+
+                    self.tree_performance.append((accuracy, tree))
                     break
+                attempts += 1
 
-            # create the decision tree classifier and train it on the bootstrap sample and feature subset
-            # print("whyyyyyyyyy")
-            # print("bootstrap y: ", bootstrap_y)
-            tree = MyDecisionTreeClassifier()
-            tree.fit(bootstrap_X, bootstrap_y, F=self.F)
+            if attempts == max_attempts:
+                raise ValueError("Failed to find a unique feature subset after multiple attempts.")
 
-            # predictions = []
+        # sort the trees by accuracy in descending order
+        self.tree_performance.sort(reverse=True, key=itemgetter(0))
+        self.trees = []
 
-            # if X_train is not None and y_train is not None:
-            #     for row in X_train:
-            #         selected_features = []
-            #         for i in feature_indices:
-            #             selected_features.append(row[i])
-            #         predictions.append(tree.predict([selected_features]))
-            #         print("row:", row)
-            #         print("sel features:", selected_features)
-            y_pred = tree.predict(out_of_bag_X)
-            accuracy = myevaluation.accuracy_score(out_of_bag_y, y_pred)
-            # print("predictions:", predictions)
-            # print("accuracy in loop:", accuracy)
-            # else:
-            #     accuracy = 0.0
+        for accuracy, tree in self.tree_performance:
+            print("Acc and tree:", accuracy, tree.tree)
 
-            self.tree_performance.append((accuracy, tree))
-
-            # sort the trees by accuracy in descending order 
-            self.tree_performance.sort(reverse=True, key=itemgetter(0))
-            self.trees = []
-
-            for __, tree in self.tree_performance[:self.M]:
-                self.trees.append(tree)
-
-        #     print("Tree in forest:", tree.tree)
-        #     print("accuracy:", accuracy)
-        # for acc, tree in self.tree_performance:
-        #         print("accuracy", acc)
-        #         print("tree in tree performance", tree.tree)
-
-        # for tree in self.trees:
-        #         print("tree in trees", tree.tree)
+        for __, tree in self.tree_performance[:self.M]:
+            self.trees.append(tree)
 
     def predict(self, X_test):
         """

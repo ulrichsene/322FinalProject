@@ -27,15 +27,14 @@ y_train_interview = ["False", "False", "True", "True", "True", "False", "True", 
 def test_random_forest_classifier_fit():
     # N = number of trees, M = features, F = features per split
     # seed random generator here:
-    random.seed(0)
-    model = MyRandomForestClassifier(N=5, M=3, F=2)
+    model = MyRandomForestClassifier(N=5, M=3, F=2, seed_random=4)
     model.fit(X_train_interview, y_train_interview)
 
     for idx, dt in enumerate(model.trees, start=1):
         print(f"Tree {idx}:")
         print(dt.tree)
         print("-" * 40)
-    
+
     # check the correct number of trees (N) were created in the ensemble
     assert len(model.trees) == model.M
 
@@ -48,7 +47,7 @@ def test_random_forest_classifier_fit():
     assert len(tree_signatures) == len(set(tree_signatures))
 
 def test_random_forest_classifier_predict():
-    model = MyRandomForestClassifier(N =5, M =3, F = 2)
+    model = MyRandomForestClassifier(N =5, M =3, F = 2, seed_random=5)
     model.fit(X_train_interview, y_train_interview)
 
     # test cases:
