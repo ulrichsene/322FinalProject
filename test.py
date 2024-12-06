@@ -4,7 +4,7 @@ import pickle
 with open('naive_bayes_model.p', 'rb') as model_file:
     model = pickle.load(model_file)
 
-# Test with a few different inputs
+
 test_data = [
     [22.0, 5.5, 110.0, 0, 0.0, 0.0],  # Example 1: female, normal glucose
     [22.0, 5.5, 210.0, 0, 0.0, 0.0],  # Example 2: female, high glucose

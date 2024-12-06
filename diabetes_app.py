@@ -22,7 +22,7 @@ def predict():
     hypertension = request.args.get("hypertension")
     heart_disease = request.args.get("heart_disease")
 
-    instance = [age, a1c_level, glucose_level, gender, hypertension, heart_disease ]
+    instance = [[age, a1c_level, glucose_level, gender, hypertension, heart_disease]]
 
     # load the naive bayes model
     model = load_model()
@@ -37,4 +37,4 @@ def predict():
     return "Error making a prediction", 400
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port = 5001, debug = True)
+    app.run(host="0.0.0.0", port = 5001, debug = False)
