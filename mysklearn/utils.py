@@ -541,10 +541,9 @@ def cross_val_predict(X, y, classifier, n_splits=10, random_state=None, shuffle=
             
             # get the corresponding prediction for this test index from fold_predictions
             current_prediction = fold_predictions[index]
-            
+
             # place the prediction in the predictions list at the position of current_test_index
             predictions[current_test_index] = current_prediction
-
 
     return predictions
 

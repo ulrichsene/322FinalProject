@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 def load_model():
     # load the trained naive bayes model from the file
-    with open("naive_bayes_model.p", "rb") as model_file:
+    with open("knn_model.p", "rb") as model_file:
         model = pickle.load(model_file)
     return model
 
