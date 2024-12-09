@@ -745,13 +745,13 @@ def prepare_mixed_data():
    normalized_glucose_level = normalize_train_attribute(glucose_values)
    
    # get rest of X columns
-   gender_values = data.get_column("gender")
+#    gender_values = data.get_column("gender")
    hyptertension_values = data.get_column("hypertension")
    heart_disease_values = data.get_column("heart_disease")
 #    smoking_values = data.get_column("smoking_history")
    
    # combine these values into X
-   X = combine_normalized_attributes2(normalized_age, normalized_a1c, normalized_glucose_level, gender_values, hyptertension_values, heart_disease_values)
+   X = combine_normalized_attributes2(normalized_age, normalized_a1c, normalized_glucose_level, hyptertension_values, heart_disease_values)
    
    # get target value
    diabetes = data.get_column("diabetes")

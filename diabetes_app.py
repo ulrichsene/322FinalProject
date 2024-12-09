@@ -21,14 +21,13 @@ def index():
 
 @app.route("/predict")
 def predict():
-    age = request.args.get("age")
-    a1c_level = request.args.get("a1c_level")
-    glucose_level = request.args.get("glucose_level")
-    gender = request.args.get("gender")
-    hypertension = request.args.get("hypertension")
-    heart_disease = request.args.get("heart_disease")
+    age = float(request.args.get("age"))
+    a1c_level = float(request.args.get("a1c_level"))
+    glucose_level = float(request.args.get("glucose_level"))
+    hypertension = float(request.args.get("hypertension"))
+    heart_disease = float(request.args.get("heart_disease"))
 
-    instance = [[age, a1c_level, glucose_level, gender, hypertension, heart_disease]]
+    instance = [[age, a1c_level, glucose_level, hypertension, heart_disease]]
 
     # load the naive bayes model
     model = load_model()
