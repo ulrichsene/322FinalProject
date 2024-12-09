@@ -5,15 +5,15 @@ How to normalize non-categorical values:
 x_val - min/ range
 
 age data: 
-range: 79.76
-min: 0.24
+range: 79.12
+min: 0.88
 
 HbA1c_level data: 
-range: 3.1
+range: 5.5
 min: 3.5
 
 blood_glucose_level data: 
-range: 120.0
+range: 220.0
 min: 80.0
 
 link to unprocessed diabetes prediciton dataset:
