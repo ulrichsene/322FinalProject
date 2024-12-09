@@ -9,6 +9,12 @@ def load_model():
         model = pickle.load(model_file)
     return model
 
+# def load_model():
+#     # load the trained naive bayes model from the file
+#     with open("naive_bayes_model.p", "rb") as model_file:
+#         model = pickle.load(model_file)
+#     return model
+
 @app.route("/")
 def index():
     return "<h1>Welcome to the Diabetes Classifier API</h1>", 200
@@ -37,4 +43,4 @@ def predict():
     return "Error making a prediction", 400
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port = 5001, debug = False)
+    app.run(host="0.0.0.0", port = 5001, debug = True)
