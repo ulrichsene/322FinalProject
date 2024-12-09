@@ -1,9 +1,2 @@
 # 322FinalProject
-to merge branches:
-    * add and commit on your branch
-    * if applicable: fetch on your branch and merge with main
-    * then push
-    * git checkout main
-    * git fetch? 
-    * git merge with your branch
-    * git push!!!
+Our final implemented classifier is KNN. To test an instance, you must pass in normalized values for non-categorical values (age, a1c_level, glucose). This will provide the most accurate predicitons!
