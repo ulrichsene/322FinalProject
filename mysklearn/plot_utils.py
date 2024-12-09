@@ -1,3 +1,12 @@
+##############################################
+# Programmer: Hannah Horn, Eva Ulrichsen
+# Class: CPSC 322-01 Fall 2024
+# Programming Assignment #final project
+# 12/9/24
+# I did not attempt the bonus
+# Description: This program contains graphing functions for the dataset.
+#########################
+
 from mysklearn.mypytable import MyPyTable
 import mysklearn.utils as utils
 import numpy as np

@@ -1,8 +1,4 @@
-
-import numpy as np
-import random
 from mysklearn.myclassifiers import MyRandomForestClassifier
-from mysklearn import utils
 
 # 14 instance interview dataset (test case 1)
 # header_interview = ["level", "lang", "tweets", "phd", "interviewed_well"]

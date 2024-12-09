@@ -1,3 +1,12 @@
+##############################################
+# Programmer: Hannah Horn, Eva Ulrichsen
+# Class: CPSC 322-01 Fall 2024
+# Programming Assignment #final project
+# 12/9/24
+# I did not attempt the bonus
+# Description: This program contains MyPyTable methods
+#########################
+
 import copy
 import csv
 import random

@@ -1,7 +1,14 @@
+##############################################
+# Programmer: Hannah Horn, Eva Ulrichsen
+# Class: CPSC 322-01 Fall 2024
+# Programming Assignment #final project
+# 12/9/24
+# I did not attempt the bonus
+# Description: This program contains helper functions for classifiers.
+# Contains math functions and general use functions.
+#########################
+
 import numpy as np
-import random
-import csv
-from collections import defaultdict
 from tabulate import tabulate
 from mysklearn.mypytable import MyPyTable
 from mysklearn import myevaluation

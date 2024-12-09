@@ -1,13 +1,12 @@
 ##############################################
-# Programmer: Hannah Horn
+# Programmer: Hannah Horn, Eva Ulrichsen
 # Class: CPSC 322-01 Fall 2024
-# Programming Assignment #6
-# 11/7/24
+# Programming Assignment #final project
+# 12/9/24
 # I did not attempt the bonus
-# Description: This program contains the various evaluation
-# implementations that we use to test the performance
-# of a classifier
-##############################################
+# Description: This program contains helper functions for classifiers.
+# Also contains sampling functions
+#########################
 
 from mysklearn import utils
 import random
@@ -203,69 +202,6 @@ def stratified_kfold_split(X, y, n_splits=5, random_state=None, shuffle=False):
 
     return stratified_folds
 
-# def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
-#     """Split dataset into bootstrapped training set and out of bag test set.
-
-#     Args:
-#         X(list of list of obj): The list of samples
-#         y(list of obj): The target y values (parallel to X)
-#             Default is None (in this case, the calling code only wants to sample X)
-#         n_samples(int): Number of samples to generate. If left to None (default) this is automatically
-#             set to the first dimension of X.
-#         random_state(int): integer used for seeding a random number generator for reproducible results
-
-#     Returns:
-#         X_sample(list of list of obj): The list of samples
-#         X_out_of_bag(list of list of obj): The list of "out of bag" samples (e.g. left-over samples)
-#         y_sample(list of obj): The list of target y values sampled (parallel to X_sample)
-#             None if y is None
-#         y_out_of_bag(list of obj): The list of target y values "out of bag" (parallel to X_out_of_bag)
-#             None if y is None
-#     Notes:
-#         Loosely based on sklearn's resample():
-#             https://scikit-learn.org/stable/modules/generated/sklearn.utils.resample.html
-#         Sample indexes of X with replacement, then build X_sample and X_out_of_bag
-#             as lists of instances using sampled indexes (use same indexes to build
-#             y_sample and y_out_of_bag)
-#     """
-
-#     # sets the random seed after checking if random_state is provided
-#     # if random_state:
-#     random.seed(random_state)
-#     # else:
-#     #     random.seed(0)
-#     # determine the number of samples (n_samples) if not provided
-#     if n_samples is None:
-#         n_samples = len(X)
-#     # initialize empty lists
-#     X_sample = [] # stores bootstrapped training samples
-#     X_out_of_bag = [] # stores out-of-bag test samples
-#     y_sample = [] # stores bootstrapped target values (if y is not none)
-#     y_out_of_bag = [] # stores out-of-bag target values (if y is not none)
-
-#     # need a set to track the unique indexes that were selected
-#     selected_indexes = set()
-
-#     # use loop to generate the bootstrap sample (training and target) with replacement
-#     for _ in range(n_samples):
-#         index = random.randint(0, len(X) - 1)
-#         X_sample.append(X[index])
-#         if y is not None:
-#             y_sample.append(y[index])
-#         selected_indexes.add(index)
-
-#     # use loop to create out-of-bag samples
-#     for i in range(len(X)):
-#         if i not in selected_indexes:
-#             X_out_of_bag.append(X[i])
-#             if y is not None:
-#                 y_out_of_bag.append(y[i])
-
-#     if y is not None:
-#         return X_sample, X_out_of_bag, y_sample, y_out_of_bag
-#     else:
-#         return X_sample, X_out_of_bag, None, None
-
 def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
     """Split dataset into bootstrapped training set and out of bag test set.
 
@@ -363,45 +299,6 @@ def confusion_matrix(y_true, y_pred, labels):
 
     return matrix
 
-# def accuracy_score(y_true, y_pred, normalize=True):
-#     """Compute the classification prediction accuracy score.
-
-#     Args:
-#         y_true(list of obj): The ground_truth target y values
-#             The shape of y is n_samples
-#         y_pred(list of obj): The predicted target y values (parallel to y_true)
-#             The shape of y is n_samples
-#         normalize(bool): If False, return the number of correctly classified samples.
-#             Otherwise, return the fraction of correctly classified samples.
-
-#     Returns:
-#             score(float): If normalize == True, return the fraction of correctly classified samples (float),
-#             else returns the number of correctly classified samples (int).
-
-#     Notes:
-#         Loosely based on sklearn's accuracy_score():
-#             https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score
-#     """
-
-#     # good practice to ensure that the lengths of y_true and y_pred match
-#     if len(y_true) != len(y_pred):
-#         raise ValueError("The lengths of y_true and y_pred must be the same!")
-
-#     # need to keep track of how many correct predictions when loop through
-#     correct_predictions = 0
-
-#     # loop through true values and corresponding predictions
-#     for i in range(len(y_true)):
-#         if y_true[i] == y_pred[i]: # check to see if there's a match
-#             correct_predictions += 1
-
-#     # need to provide implementation if normalize is True
-#     if normalize is True:
-#         return correct_predictions / len(y_true)
-#     else:
-#         return correct_predictions
-
-# eva method
 def accuracy_score(y_true, y_pred, normalize=True):
     """Compute the classification prediction accuracy score.
 

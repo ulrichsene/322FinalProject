@@ -1,3 +1,12 @@
+##############################################
+# Programmer: Hannah Horn, Eva Ulrichsen
+# Class: CPSC 322-01 Fall 2024
+# Programming Assignment #final project
+# 12/9/24
+# I did not attempt the bonus
+# Description: This deploys KNN API.
+#########################
+
 import pickle
 from flask import Flask, request, jsonify
 
@@ -8,12 +17,6 @@ def load_model():
     with open("knn_model.p", "rb") as model_file:
         model = pickle.load(model_file)
     return model
-
-# def load_model():
-#     # load the trained naive bayes model from the file
-#     with open("naive_bayes_model.p", "rb") as model_file:
-#         model = pickle.load(model_file)
-#     return model
 
 @app.route("/")
 def index():
